@@ -5,8 +5,9 @@ public class TS_Utils {
 		if (fileName.substring(fileName.length() - 3).equals(".TS")
 				|| fileName.substring(fileName.length() - 3).equals(".ts")) {
 			return true;
-		} else {
+		} else { 
 			return false;
 		}
 	}
 }
+ 

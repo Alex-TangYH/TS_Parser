@@ -1,11 +1,17 @@
 package com.alex.ts_parser.native_function;
 
-public class NativeFunctionManager {
-	native public static int parseTSFileNative(String filePath);
+import com.alex.ts_parser.bean.psi.PAT_Table;
 
+public class NativeFunctionManager {
 	static {
-		System.loadLibrary("libC_ParseTS");
+		System.loadLibrary("libC_ParseTS_Lib");
 	}
+
+	public native static int parseTSFileNative(String filePath);
+
+	public native static TestClass parseAge();
+	
+	public native static PAT_Table parsePAT();
 
 	private static volatile NativeFunctionManager nativeFunctionManager;
 

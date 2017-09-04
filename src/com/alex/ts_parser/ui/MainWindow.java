@@ -68,7 +68,6 @@ public class MainWindow {
 					}
 				} else {
 					logger.info("没有选中文件");
-					logger.info("11111");
 				}
 
 				logger.info(filePath);
