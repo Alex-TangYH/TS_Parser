@@ -1,4 +1,4 @@
-package com.alex.ts_parser.native_function;
+package com.alex.ts_parser.bean.psi;
 
 public class TestClass {
 	int i;

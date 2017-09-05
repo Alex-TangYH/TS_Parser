@@ -1,5 +1,7 @@
 package com.alex.ts_parser.bean.psi;
 
+import com.alex.ts_parser.utils.CTypeFormat2JavaType;
+
 public class PAT_Table {
 	private int uiTable_id;
 	private int uiSection_syntax_indicator;
@@ -19,7 +21,7 @@ public class PAT_Table {
 	public PAT_Table(int uiTable_id, int uiSection_syntax_indicator, int uiZero, int uiReserved_first,
 			int uiSection_length, int uiTransport_stream_id, int uiReserved_second, int uiVersion_number,
 			int uiCurrent_next_indicator, int uiSection_number, int uiLast_section_number,
-			PAT_ProgramInfo[] patProgramInfo, int uiNetwork_PID, long uiCRC_32) {
+			PAT_ProgramInfo[] patProgramInfo, int uiNetwork_PID, int uiCRC_32) {
 		this.uiTable_id = uiTable_id;
 		this.uiSection_syntax_indicator = uiSection_syntax_indicator;
 		this.uiZero = uiZero;
@@ -33,7 +35,7 @@ public class PAT_Table {
 		this.uiLast_section_number = uiLast_section_number;
 		this.patProgramInfo = patProgramInfo;
 		this.uiNetwork_PID = uiNetwork_PID;
-		this.uiCRC_32 = uiCRC_32;
+		this.uiCRC_32 = CTypeFormat2JavaType.getUnsignedInt2Long(uiCRC_32);
 	}
 
 	@Override
@@ -43,24 +45,25 @@ public class PAT_Table {
 				+ uiSection_length + ", uiTransport_stream_id=" + uiTransport_stream_id + ", uiReserved_second="
 				+ uiReserved_second + ", uiVersion_number=" + uiVersion_number + ", uiCurrent_next_indicator="
 				+ uiCurrent_next_indicator + ", uiSection_number=" + uiSection_number + ", uiLast_section_number="
-				+ uiLast_section_number + ", patProgramInfo=" + patProgramInfo[0].toString() + ", uiNetwork_PID=" + uiNetwork_PID
-				+ ", uiCRC_32=" + uiCRC_32 + "]";
+				+ uiLast_section_number + ", " + ", uiNetwork_PID=" + uiNetwork_PID + ", uiCRC_32=" + uiCRC_32 + "]"
+				+ "\n" + patProgramInfo[0].toString();
 	}
-	
 }
 
 class PAT_ProgramInfo {
 	private int uiProgram_number;
 	private int uiReserved;
 	private int uiProgram_map_PID;
+
 	public PAT_ProgramInfo(int uiProgram_number, int uiReserved, int uiProgram_map_PID) {
 		this.uiProgram_number = uiProgram_number;
 		this.uiReserved = uiReserved;
 		this.uiProgram_map_PID = uiProgram_map_PID;
 	}
+
 	@Override
 	public String toString() {
-		return "PAT_ProgramInfo [uiProgram_number=" + uiProgram_number + ", uiReserved=" + uiReserved
+		return "PAT_ProgramInfo" + " [uiProgram_number=" + uiProgram_number + ", uiReserved=" + uiReserved
 				+ ", uiProgram_map_PID=" + uiProgram_map_PID + "]";
 	}
 }

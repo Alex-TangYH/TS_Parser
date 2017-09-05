@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 
 import com.alex.ts_parser.ui.MainWindow;
-import com.alex.ts_parser.ui.Test;
 
 public class Main { 
 	/**

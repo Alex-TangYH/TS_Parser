@@ -1,6 +1,7 @@
 package com.alex.ts_parser.native_function;
 
 import com.alex.ts_parser.bean.psi.PAT_Table;
+import com.alex.ts_parser.bean.psi.TestClass;
 
 public class NativeFunctionManager {
 	static {

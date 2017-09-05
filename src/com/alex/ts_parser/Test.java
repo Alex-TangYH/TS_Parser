@@ -1,11 +1,10 @@
-package com.alex.ts_parser.ui;
+package com.alex.ts_parser;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
-import com.alex.ts_parser.native_function.TestClass;
-import com.alex.ts_parser.utils.StringResocesHelper;
 
 public class Test {
 	private static Logger logger = LogManager.getLogger("");
@@ -18,8 +17,10 @@ public class Test {
 		
 //		String key = "MainWindow.MenuBar.MenuItem.File" ;
 //		StringResocesHelper.GetStringByKey(key);
-		TestClass testClass =  NativeFunctionManager.parseAge();
-		logger.info(testClass.toString()); ;
+		
+//		TestClass testClass =  NativeFunctionManager.parseAge();
+		PAT_Table pat = NativeFunctionManager.parsePAT();
+		System.out.println(pat.toString());
 		System.out.println("testFuction excute");
 	}
 	
