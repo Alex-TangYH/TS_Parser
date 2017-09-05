@@ -1,0 +1,88 @@
+package com.alex.ts_parser.utils;
+
+import java.lang.reflect.Field;
+
+import javax.swing.tree.DefaultMutableTreeNode;
+
+public class ReflectUtils {
+	public static void getObjAttr(Object obj) {
+		// 获取对象obj的所有属性域
+		Field[] fields = obj.getClass().getDeclaredFields();
+
+		for (Field field : fields) {
+			// 对于每个属性，获取属性名
+			String varName = field.getName();
+			try {
+				boolean access = field.isAccessible();
+				if (!access)
+					field.setAccessible(true);
+				// 从obj中获取field变量
+				Object o = field.get(obj);
+
+				if (o.getClass().isArray()) { // 判断是否是数组
+					Object[] arr = (Object[]) o; // 装换成数组
+					for (Object a : arr) {
+						getObjAttr(a);
+					}
+				} else {
+					System.out.println("变量： " + varName + " = " + o);
+				}
+
+				if (!access)
+					field.setAccessible(false);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+
+	public static DefaultMutableTreeNode getTreeByObjAttr(Object obj, DefaultMutableTreeNode parentNode) {
+		// 获取对象obj的所有属性域
+		Field[] fields = obj.getClass().getDeclaredFields();
+
+		for (Field field : fields) {
+			// 对于每个属性，获取属性名
+			String varName = field.getName();
+			try {
+				boolean access = field.isAccessible();
+				if (!access)
+					field.setAccessible(true);
+
+				// 从obj中获取field变量
+				Object o = field.get(obj);
+				DefaultMutableTreeNode childs = null;
+				if (o.getClass().isArray()) { // 判断是否是数组
+					Object[] arr = (Object[]) o; // 装换成数组
+					DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
+					parentNode.add(arrayChilds);
+					for (Object a : arr) {
+						childs = new DefaultMutableTreeNode(varName);
+						arrayChilds.add(getTreeByObjAttr(a, childs));
+					}
+				} else if (!isJavaClass(o.getClass())) {
+					childs = new DefaultMutableTreeNode(varName);
+					getTreeByObjAttr(o, childs);
+					parentNode.add(childs);
+				} else {
+					childs = new DefaultMutableTreeNode(varName + " = " + o);
+					parentNode.add(childs);
+				}
+				if (!access)
+					field.setAccessible(false);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return parentNode;
+	}
+
+	/**
+	 * 判断一个类是JAVA类型还是用户定义类型
+	 * 
+	 * @param clz
+	 * @return
+	 */
+	public static boolean isJavaClass(Class<?> clz) {
+		return clz != null && clz.getClassLoader() == null;
+	}
+}
