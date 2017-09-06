@@ -32,4 +32,13 @@ public class Descriptor {
 		//getValue(descriptorTag);
 		return null;
 	}
+
+	public Descriptor(int descriptorTag, int descriptorLength) {
+		this.descriptorTag = descriptorTag;
+		this.descriptorLength = descriptorLength;
+	}
+	
+	public Descriptor() {
+		
+	}
 }

@@ -7,9 +7,17 @@ package com.alex.ts_parser.bean.descriptor;
  *
  */
 public class CA_Descriptor extends Descriptor {
-	int descriptorTag;
-	int descriptorLength;
 	int caSystemId;
 	int reserved;
 	byte privateDataByte[];
+
+	public CA_Descriptor(int descriptorTag, int descriptorLength) {
+		super(descriptorTag, descriptorLength);
+	}
+
+	public CA_Descriptor(int descriptorTag, int descriptorLength, int caSystemId, int reserved) {
+		super(descriptorTag, descriptorLength);
+		this.caSystemId = caSystemId;
+		this.reserved = reserved;
+	}
 }
