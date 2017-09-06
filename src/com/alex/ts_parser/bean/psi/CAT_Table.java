@@ -121,11 +121,14 @@ public class CAT_Table {
 				+ ", sectionNumber=" + sectionNumber + ", lastSectionNumber=" + lastSectionNumber + ", crc32=" + crc32
 				+ "]";
 	}
+	
+	public CAT_Table() {
+		super();
+	}
 
 	public CAT_Table(int tableId, int sectionSyntaxIndicator, int zero, int reservedFirst, int sectionLength,
 			int reservedSecond, int versionNumber, int currentNextIndicator, int sectionNumber, int lastSectionNumber,
-			Descriptor[] descriptorArray, int crc32) {
-		super();
+			int crc32) {
 		this.tableId = tableId;
 		this.sectionSyntaxIndicator = sectionSyntaxIndicator;
 		this.zero = zero;
@@ -136,9 +139,26 @@ public class CAT_Table {
 		this.currentNextIndicator = currentNextIndicator;
 		this.sectionNumber = sectionNumber;
 		this.lastSectionNumber = lastSectionNumber;
-		this.descriptorArray = descriptorArray;
 		this.crc32 = CTypeFormat2JavaType.getUnsignedInt2Long(crc32);
 	}
+
+//	public CAT_Table(int tableId, int sectionSyntaxIndicator, int zero, int reservedFirst, int sectionLength,
+//			int reservedSecond, int versionNumber, int currentNextIndicator, int sectionNumber, int lastSectionNumber,
+//			Descriptor[] descriptorArray, int crc32) {
+//		super();
+//		this.tableId = tableId;
+//		this.sectionSyntaxIndicator = sectionSyntaxIndicator;
+//		this.zero = zero;
+//		this.reservedFirst = reservedFirst;
+//		this.sectionLength = sectionLength;
+//		this.reservedSecond = reservedSecond;
+//		this.versionNumber = versionNumber;
+//		this.currentNextIndicator = currentNextIndicator;
+//		this.sectionNumber = sectionNumber;
+//		this.lastSectionNumber = lastSectionNumber;
+//		this.descriptorArray = descriptorArray;
+//		this.crc32 = CTypeFormat2JavaType.getUnsignedInt2Long(crc32);
+//	}
 	
 	
 	

@@ -4,7 +4,12 @@ import java.lang.reflect.Field;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class ReflectUtils {
+	private static Logger logger = LogManager.getLogger("");
+
 	public static void getObjAttr(Object obj) {
 		// 获取对象obj的所有属性域
 		Field[] fields = obj.getClass().getDeclaredFields();
@@ -18,8 +23,9 @@ public class ReflectUtils {
 					field.setAccessible(true);
 				// 从obj中获取field变量
 				Object o = field.get(obj);
-
-				if (o.getClass().isArray()) { // 判断是否是数组
+				if (o == null) {
+					logger.info("变量： " + varName + " = " + o);
+				} else if (o.getClass().isArray()) { // 判断是否是数组
 					Object[] arr = (Object[]) o; // 装换成数组
 					for (Object a : arr) {
 						getObjAttr(a);
@@ -51,7 +57,9 @@ public class ReflectUtils {
 				// 从obj中获取field变量
 				Object o = field.get(obj);
 				DefaultMutableTreeNode childs = null;
-				if (o.getClass().isArray()) { // 判断是否是数组
+				if (o == null) {
+					logger.info(varName + "is null");
+				} else if (o.getClass().isArray()) { // 判断是否是数组
 					Object[] arr = (Object[]) o; // 装换成数组
 					DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
 					parentNode.add(arrayChilds);
