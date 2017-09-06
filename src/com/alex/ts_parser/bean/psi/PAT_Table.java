@@ -38,10 +38,6 @@ public class PAT_Table {
 		this.crc32 = CTypeFormat2JavaType.getUnsignedInt2Long(crc32);
 	}
 
-	public PAT_Table() {
-		super();
-	}
-
 	public int getTableId() {
 		return tableId;
 	}

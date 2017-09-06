@@ -19,7 +19,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.alex.ts_parser.bean.psi.CAT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
 import com.alex.ts_parser.utils.ReflectUtils;
@@ -32,7 +31,7 @@ public class MainWindow {
 	private JPanel jpContentPanel;
 	private JMenuBar jmbMainMenuBar;
 	private JPanel jpBottomPanel;
-	private Logger logger = LogManager.getLogger("");
+	Logger logger = LogManager.getLogger("");
 
 	/**
 	 * Create the application.
@@ -64,7 +63,7 @@ public class MainWindow {
 	 */
 	private void initMainFrame() {
 		frmTs = new JFrame();
-		frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title"));
+		frmTs.setTitle("TS\u6D41\u89E3\u6790\u7A0B\u5E8F");
 		frmTs.setBounds(100, 100, 904, 623);
 		frmTs.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -76,10 +75,10 @@ public class MainWindow {
 		jpBottomPanel = new JPanel();
 		frmTs.getContentPane().add(jpBottomPanel, BorderLayout.SOUTH);
 
-		JButton btnNewButton = new JButton(StringResocesHelper.getStringByKey("MainWindow.Button.PSI_SI"));
+		JButton btnNewButton = new JButton("PSI/SI");
 		jpBottomPanel.add(btnNewButton);
 
-		JButton btnNewButton_1 = new JButton(StringResocesHelper.getStringByKey("MainWindow.Button.EPG"));
+		JButton btnNewButton_1 = new JButton("EPG");
 		jpBottomPanel.add(btnNewButton_1);
 	}
 
@@ -89,7 +88,7 @@ public class MainWindow {
 	private void initTitlePanel() {
 		JPanel titlePanel = new JPanel();
 		frmTs.getContentPane().add(titlePanel, BorderLayout.NORTH);
-		JLabel lbTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"));
+		JLabel lbTitle = new JLabel("PSI/SI \u5B8C\u5168\u89E3\u6790");
 		titlePanel.add(lbTitle);
 	}
 
@@ -101,7 +100,7 @@ public class MainWindow {
 		frmTs.getContentPane().add(jpContentPanel, BorderLayout.CENTER);
 		jpContentPanel.setLayout(new BorderLayout(0, 0));
 	}
-	
+
 	/**
 	 * 初始化菜单栏
 	 */
@@ -135,27 +134,12 @@ public class MainWindow {
 		// TODO 将各个表解析后放入jtree
 		JScrollPane jScrollPane1 = new JScrollPane();
 
-		// 树根
-		DefaultMutableTreeNode treeRoot = new DefaultMutableTreeNode();
-		DefaultMutableTreeNode psiRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI"));
-		DefaultMutableTreeNode siRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI"));
-		treeRoot.add(psiRoot);
-		treeRoot.add(siRoot);
-
 		// pat表
-		DefaultMutableTreeNode patRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PAT"));
+		DefaultMutableTreeNode patRoot = new DefaultMutableTreeNode("PAT");
 		PAT_Table pat = NativeFunctionManager.parsePAT();
 		ReflectUtils.getTreeByObjAttr(pat, patRoot);
-		psiRoot.add(patRoot);
+		JTree tree = new JTree(patRoot);
 
-		// cat表
-		DefaultMutableTreeNode catRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.CAT"));
-		CAT_Table cat = NativeFunctionManager.parseCAT();
-		ReflectUtils.getTreeByObjAttr(cat, catRoot);
-		psiRoot.add(catRoot);
-		
-		// 加入容器
-		JTree tree = new JTree(treeRoot);
 		jScrollPane1.setViewportView(tree);
 		jPanel.add(jScrollPane1);
 	}
@@ -179,7 +163,7 @@ public class MainWindow {
 				if (filePath == null || filePath.isEmpty()) {
 					logger.info("没有选中文件");
 				} else if (TS_Utils.isTsFile(filePath)) {
-					frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title") + "   " + filePath);
+					frmTs.setTitle("TS\u6D41\u89E3\u6790\u7A0B\u5E8F" + "   " + filePath);
 					addTree(jpContentPanel);
 				} else {
 					logger.info("不是TS文件");
