@@ -1,11 +1,14 @@
 package com.alex.ts_parser.utils;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.alex.ts_parser.bean.descriptor.Descriptor;
 
 public class ReflectUtils {
 	private static Logger logger = LogManager.getLogger("");
@@ -26,9 +29,16 @@ public class ReflectUtils {
 				if (o == null) {
 					logger.info("变量： " + varName + " = " + o);
 				} else if (o.getClass().isArray()) { // 判断是否是数组
-					Object[] arr = (Object[]) o; // 装换成数组
-					for (Object a : arr) {
-						getObjAttr(a);
+					if (!isJavaClass(o.getClass())) {
+						Object[] arr = (Object[]) o; // 装换成数组
+						for (Object a : arr) {
+							getObjAttr(a);
+						}
+					} else {
+						Class<?> cla = o.getClass();
+						if (cla.getName().equals("[B")) {
+							System.out.println("变量： " + varName + " = " + Arrays.toString((byte[]) o));
+						}
 					}
 				} else {
 					System.out.println("变量： " + varName + " = " + o);
@@ -60,12 +70,29 @@ public class ReflectUtils {
 				if (o == null) {
 					logger.info(varName + "is null");
 				} else if (o.getClass().isArray()) { // 判断是否是数组
-					Object[] arr = (Object[]) o; // 装换成数组
-					DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
-					parentNode.add(arrayChilds);
-					for (Object a : arr) {
-						childs = new DefaultMutableTreeNode(varName);
-						arrayChilds.add(getTreeByObjAttr(a, childs));
+					if (!isJavaClass(o.getClass())) {
+						Object[] arr = (Object[]) o; // 装换成数组
+						if(field.getName().equals("descriptorArray")) {
+							varName = "描述子";
+						}
+						DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
+						parentNode.add(arrayChilds);
+						for (Object a : arr) {
+							System.out.println(a.getClass().toString());
+							if(a instanceof Descriptor) {
+								varName = ((Descriptor) a).getDescriptorName();
+							}else {
+							}
+							childs = new DefaultMutableTreeNode(varName);
+							arrayChilds.add(getTreeByObjAttr(a, childs));
+						}
+					} else {
+						Class<?> cla = o.getClass();
+						if (cla.getName().equals("[B")) {
+							System.out.println("变量： " + varName + " = " + Arrays.toString((byte[]) o));
+							childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((byte[]) o));
+							parentNode.add(childs);
+						}
 					}
 				} else if (!isJavaClass(o.getClass())) {
 					childs = new DefaultMutableTreeNode(varName);

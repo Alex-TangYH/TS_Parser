@@ -15,9 +15,11 @@ public class CA_Descriptor extends Descriptor {
 		super(descriptorTag, descriptorLength);
 	}
 
-	public CA_Descriptor(int descriptorTag, int descriptorLength, int caSystemId, int reserved) {
+	public CA_Descriptor(int descriptorTag, int descriptorLength, int caSystemId, int reserved,
+			byte[] privateDataByte) {
 		super(descriptorTag, descriptorLength);
 		this.caSystemId = caSystemId;
 		this.reserved = reserved;
+		this.privateDataByte = privateDataByte;
 	}
 }
