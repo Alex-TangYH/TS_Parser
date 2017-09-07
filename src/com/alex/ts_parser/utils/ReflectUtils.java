@@ -15,6 +15,9 @@ public class ReflectUtils {
 
 	public static void getObjAttr(Object obj) {
 		// 获取对象obj的所有属性域
+		if (obj == null) {
+			return;
+		}
 		Field[] fields = obj.getClass().getDeclaredFields();
 
 		for (Field field : fields) {
@@ -37,11 +40,11 @@ public class ReflectUtils {
 					} else {
 						Class<?> cla = o.getClass();
 						if (cla.getName().equals("[B")) {
-							System.out.println("变量： " + varName + " = " + Arrays.toString((byte[]) o));
+							logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
 						}
 					}
 				} else {
-					System.out.println("变量： " + varName + " = " + o);
+					logger.info("变量： " + varName + " = " + o);
 				}
 
 				if (!access)
@@ -53,6 +56,11 @@ public class ReflectUtils {
 	}
 
 	public static DefaultMutableTreeNode getTreeByObjAttr(Object obj, DefaultMutableTreeNode parentNode) {
+		if (obj == null) {
+			DefaultMutableTreeNode nullNode = new DefaultMutableTreeNode("");
+			return nullNode;
+		}
+
 		// 获取对象obj的所有属性域
 		Field[] fields = obj.getClass().getDeclaredFields();
 
@@ -72,24 +80,27 @@ public class ReflectUtils {
 				} else if (o.getClass().isArray()) { // 判断是否是数组
 					if (!isJavaClass(o.getClass())) {
 						Object[] arr = (Object[]) o; // 装换成数组
-						if(field.getName().equals("descriptorArray")) {
+						if (field.getName().equals("descriptorArray")) {
 							varName = "描述子";
 						}
 						DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
 						parentNode.add(arrayChilds);
 						for (Object a : arr) {
-							System.out.println(a.getClass().toString());
-							if(a instanceof Descriptor) {
+							if (a == null) {
+								logger.info("出现空描述子对象");
+								continue;
+							} else if (a instanceof Descriptor) {
 								varName = ((Descriptor) a).getDescriptorName();
-							}else {
+								childs = new DefaultMutableTreeNode(varName);
+								childs.add(new DefaultMutableTreeNode("descriptorTag = "+((Descriptor) a).getDescriptorTag()));
+								childs.add(new DefaultMutableTreeNode("descriptorLength = "+((Descriptor) a).getDescriptorLength()));
+								arrayChilds.add(getTreeByObjAttr(a, childs));
 							}
-							childs = new DefaultMutableTreeNode(varName);
-							arrayChilds.add(getTreeByObjAttr(a, childs));
 						}
 					} else {
 						Class<?> cla = o.getClass();
 						if (cla.getName().equals("[B")) {
-							System.out.println("变量： " + varName + " = " + Arrays.toString((byte[]) o));
+							logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
 							childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((byte[]) o));
 							parentNode.add(childs);
 						}
