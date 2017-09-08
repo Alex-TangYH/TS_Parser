@@ -33,7 +33,9 @@ public class MainWindow {
 	private JMenuBar jmbMainMenuBar;
 	private JPanel jpBottomPanel;
 	private Logger logger = LogManager.getLogger("");
-
+	private String filePath = null;
+	private String fileName = null;
+	
 	/**
 	 * Create the application.
 	 */
@@ -144,15 +146,23 @@ public class MainWindow {
 
 		// pat表
 		DefaultMutableTreeNode patRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PAT"));
-		PAT_Table pat = NativeFunctionManager.parsePAT();
-		ReflectUtils.getTreeByObjAttr(pat, patRoot);
-		psiRoot.add(patRoot);
+		PAT_Table pat = NativeFunctionManager.parsePAT(filePath);
+		if (pat != null) {
+			ReflectUtils.getTreeByObjAttr(pat, patRoot);
+			psiRoot.add(patRoot);
+		}else {
+			logger.info("pat is null");
+		}
 
 		// cat表
 		DefaultMutableTreeNode catRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.CAT"));
-		CAT_Table cat = NativeFunctionManager.parseCAT();
-		ReflectUtils.getTreeByObjAttr(cat, catRoot);
-		psiRoot.add(catRoot);
+		CAT_Table cat = NativeFunctionManager.parseCAT(filePath);
+		if (cat != null) {
+			ReflectUtils.getTreeByObjAttr(cat, catRoot);
+			psiRoot.add(catRoot);
+		}else {
+			logger.info("cat is null");
+		}
 		
 		// 加入容器
 		JTree tree = new JTree(treeRoot);
@@ -168,14 +178,11 @@ public class MainWindow {
 	private class ActionListener_OpenFile implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			JFileChooser jFileChooser = new JFileChooser();
-			String filePath = null;
-			String name = null;
-
 			int i = jFileChooser.showOpenDialog(null);
 			if (i == JFileChooser.APPROVE_OPTION) { // 打开文件
 				filePath = jFileChooser.getSelectedFile().getAbsolutePath();
-				name = jFileChooser.getSelectedFile().getName();
-				logger.info("当前文件路径：" + filePath + ";当前文件名：" + name);
+				fileName = jFileChooser.getSelectedFile().getName();
+				logger.info("当前文件路径：" + filePath + ";当前文件名：" + fileName);
 				if (filePath == null || filePath.isEmpty()) {
 					logger.info("没有选中文件");
 				} else if (TS_Utils.isTsFile(filePath)) {

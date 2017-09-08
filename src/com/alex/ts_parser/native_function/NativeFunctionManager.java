@@ -13,9 +13,9 @@ public class NativeFunctionManager {
 
 	public native static TestClass parseAge();
 	
-	public native static PAT_Table parsePAT();
+	public native static PAT_Table parsePAT(String filePath);
 
-	public native static CAT_Table parseCAT();
+	public native static CAT_Table parseCAT(String filePath);
 	
 	private static volatile NativeFunctionManager nativeFunctionManager;
 

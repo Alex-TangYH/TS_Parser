@@ -82,19 +82,32 @@ public class ReflectUtils {
 						Object[] arr = (Object[]) o; // 装换成数组
 						if (field.getName().equals("descriptorArray")) {
 							varName = "描述子";
+						} else if (field.getName().equals("patProgramInfoArray")) {
+							varName = "PMT PID信息";
 						}
 						DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
 						parentNode.add(arrayChilds);
-						for (Object a : arr) {
+//						for (Object a : arr) {
+						for (int index = 0; index < arr.length; index++) {
+							Object a = arr[index];
 							if (a == null) {
 								logger.info("出现空描述子对象");
 								continue;
-							} else if (a instanceof Descriptor) {
-								varName = ((Descriptor) a).getDescriptorName();
-								childs = new DefaultMutableTreeNode(varName);
-								childs.add(new DefaultMutableTreeNode("descriptorTag = "+((Descriptor) a).getDescriptorTag()));
-								childs.add(new DefaultMutableTreeNode("descriptorLength = "+((Descriptor) a).getDescriptorLength()));
-								arrayChilds.add(getTreeByObjAttr(a, childs));
+							} else {
+								if (a instanceof Descriptor) {
+									varName = ((Descriptor) a).getDescriptorName();
+									childs = new DefaultMutableTreeNode(varName);
+									childs.add(new DefaultMutableTreeNode(
+											"descriptorTag = " + ((Descriptor) a).getDescriptorTag()));
+									childs.add(new DefaultMutableTreeNode(
+											"descriptorLength = " + ((Descriptor) a).getDescriptorLength()));
+									arrayChilds.add(getTreeByObjAttr(a, childs));
+								} else {
+									varName = getObjectClassFileName(a);
+//									childs = new DefaultMutableTreeNode(varName);
+									childs = new DefaultMutableTreeNode(String.format("%s [%d]", varName,index));
+									arrayChilds.add(getTreeByObjAttr(a, childs));
+								}
 							}
 						}
 					} else {
@@ -130,5 +143,9 @@ public class ReflectUtils {
 	 */
 	public static boolean isJavaClass(Class<?> clz) {
 		return clz != null && clz.getClassLoader() == null;
+	}
+
+	public static String getObjectClassFileName(Object o) {
+		return o.getClass().getName().substring(o.getClass().getName().lastIndexOf(".") + 1);
 	}
 }

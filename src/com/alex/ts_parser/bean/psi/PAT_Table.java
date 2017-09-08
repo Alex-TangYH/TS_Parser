@@ -14,13 +14,13 @@ public class PAT_Table {
 	private int currentNextIndicator;
 	private int sectionNumber;
 	private int lastSectionNumber;
-	PAT_ProgramInfo patProgramInfo[];
+	PAT_ProgramInfo patProgramInfoArray[];
 	private int networkPID;
 	private long crc32;
 
 	public PAT_Table(int tableId, int sectionSyntaxIndicator, int zero, int reservedFirst, int sectionLength,
 			int transportStreamId, int reservedSecond, int versionNumber, int currentNextIndicator, int sectionNumber,
-			int lastSectionNumber, PAT_ProgramInfo[] patProgramInfo, int networkPID, int crc32) {
+			int lastSectionNumber, PAT_ProgramInfo[] patProgramInfoArray, int networkPID, int crc32) {
 		super();
 		this.tableId = tableId;
 		this.sectionSyntaxIndicator = sectionSyntaxIndicator;
@@ -33,7 +33,7 @@ public class PAT_Table {
 		this.currentNextIndicator = currentNextIndicator;
 		this.sectionNumber = sectionNumber;
 		this.lastSectionNumber = lastSectionNumber;
-		this.patProgramInfo = patProgramInfo;
+		this.patProgramInfoArray = patProgramInfoArray;
 		this.networkPID = networkPID;
 		this.crc32 = CTypeFormat2JavaType.getUnsignedInt2Long(crc32);
 	}
@@ -131,11 +131,11 @@ public class PAT_Table {
 	}
 
 	public PAT_ProgramInfo[] getPatProgramInfo() {
-		return patProgramInfo;
+		return patProgramInfoArray;
 	}
 
-	public void setPatProgramInfo(PAT_ProgramInfo[] patProgramInfo) {
-		this.patProgramInfo = patProgramInfo;
+	public void setPatProgramInfo(PAT_ProgramInfo[] patProgramInfoArray) {
+		this.patProgramInfoArray = patProgramInfoArray;
 	}
 
 	public int getNetworkPID() {
@@ -161,7 +161,7 @@ public class PAT_Table {
 				+ transportStreamId + ", reservedSecond=" + reservedSecond + ", versionNumber=" + versionNumber
 				+ ", currentNextIndicator=" + currentNextIndicator + ", sectionNumber=" + sectionNumber
 				+ ", lastSectionNumber=" + lastSectionNumber + ", networkPID=" + networkPID + ", crc32=" + crc32 + "]"
-				+ "\n" + patProgramInfo[0].toString();
+				+ "\n" + patProgramInfoArray[0].toString();
 	}
 }
 

@@ -33,19 +33,19 @@ public class FrequencyListDescriptor extends Descriptor {
 }
 
 class FrequencyListInfo {
-	private int centreFrequency;
+	private long centreFrequency;
 
-	public FrequencyListInfo(int centreFrequency) {
+	public FrequencyListInfo(long centreFrequency) {
 		super();
 		this.centreFrequency = centreFrequency;
 	}
 
-	public int getCentreFrequency() {
+	public long getCentreFrequency() {
 		return centreFrequency;
 	}
 
-	public void setCentreFrequency(int centreFrequency) {
+	public void setCentreFrequency(long centreFrequency) {
 		this.centreFrequency = centreFrequency;
 	}
-	
+
 }

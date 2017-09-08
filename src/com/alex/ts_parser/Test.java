@@ -18,7 +18,7 @@ public class Test {
 	}
 
 	public static void TestFuction() {
-		CAT_Table cat = NativeFunctionManager.parseCAT();
+		CAT_Table cat = NativeFunctionManager.parseCAT("D:\\test\\test.ts");
 		ReflectUtils.getObjAttr(cat);
 
 		logger.info("testFuction excute");
@@ -34,7 +34,7 @@ public class Test {
 		// TestClass testClass = NativeFunctionManager.parseAge();
 
 		// µ•∂¿Ω‚ŒˆPAT≤‚ ‘”Ôæ‰
-		// PAT_Table pat = NativeFunctionManager.parsePAT();
+		// PAT_Table pat = NativeFunctionManager.parsePAT("D:\\test\\test.ts");
 		// ReflectUtils.getObjAttr(pat);
 	}
 
