@@ -15,7 +15,7 @@ public class CAT_Table {
 	private int currentNextIndicator;
 	private int sectionNumber;
 	private int lastSectionNumber;
-	Descriptor descriptorArray[];
+	private Descriptor descriptorArray[];
 	private long crc32;
 
 	public int getTableId() {
