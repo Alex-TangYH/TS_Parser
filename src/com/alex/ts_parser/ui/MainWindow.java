@@ -121,6 +121,8 @@ public class MainWindow {
 
 		JMenuItem mniClose = new JMenuItem(StringResocesHelper.getStringByKey("MainWindow.MenuBar.MenuItem.Close"));
 		mnFileMenu.add(mniClose);
+		mniClose.addActionListener(new ActionListener_Close());
+		
 		JMenuItem mniHelp = new JMenuItem(StringResocesHelper.getStringByKey("MainWindow.MenuBar.MenuItem.Help"));
 		jmbMainMenuBar.add(mniHelp);
 		// TODO 增加助记符
@@ -197,5 +199,27 @@ public class MainWindow {
 			logger.info(filePath);
 		}
 
+	}
+	
+	/**
+	 * 关闭按钮监听类，清空界面数据
+	 * 
+	 * @author Administrator
+	 */
+	private class ActionListener_Close implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			cleanData();
+		}
+	}
+	
+	/**
+	 * 清空界面数据
+	 * 
+	 * @author Administrator
+	 */
+	private void cleanData()
+	{
+		jpContentPanel.removeAll();
+		jpContentPanel.repaint();
 	}
 }
