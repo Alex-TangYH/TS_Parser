@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alex.ts_parser.bean.psi.CAT_Table;
+import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
 import com.alex.ts_parser.utils.ReflectUtils;
@@ -35,7 +36,7 @@ public class MainWindow {
 	private Logger logger = LogManager.getLogger("");
 	private String filePath = null;
 	private String fileName = null;
-	
+
 	/**
 	 * Create the application.
 	 */
@@ -103,7 +104,7 @@ public class MainWindow {
 		frmTs.getContentPane().add(jpContentPanel, BorderLayout.CENTER);
 		jpContentPanel.setLayout(new BorderLayout(0, 0));
 	}
-	
+
 	/**
 	 * 初始化菜单栏
 	 */
@@ -122,7 +123,7 @@ public class MainWindow {
 		JMenuItem mniClose = new JMenuItem(StringResocesHelper.getStringByKey("MainWindow.MenuBar.MenuItem.Close"));
 		mnFileMenu.add(mniClose);
 		mniClose.addActionListener(new ActionListener_Close());
-		
+
 		JMenuItem mniHelp = new JMenuItem(StringResocesHelper.getStringByKey("MainWindow.MenuBar.MenuItem.Help"));
 		jmbMainMenuBar.add(mniHelp);
 		// TODO 增加助记符
@@ -146,26 +147,35 @@ public class MainWindow {
 		treeRoot.add(psiRoot);
 		treeRoot.add(siRoot);
 
-		// pat表
-		DefaultMutableTreeNode patRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PAT"));
-		PAT_Table pat = NativeFunctionManager.parsePAT(filePath);
-		if (pat != null) {
-			ReflectUtils.getTreeByObjAttr(pat, patRoot);
-			psiRoot.add(patRoot);
-		}else {
-			logger.info("pat is null");
-		}
-
 		// cat表
 		DefaultMutableTreeNode catRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.CAT"));
 		CAT_Table cat = NativeFunctionManager.parseCAT(filePath);
 		if (cat != null) {
 			ReflectUtils.getTreeByObjAttr(cat, catRoot);
 			psiRoot.add(catRoot);
-		}else {
+		} else {
 			logger.info("cat is null");
 		}
-		
+
+		// nit表
+		DefaultMutableTreeNode nitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.NIT"));
+		NIT_Table nit = NativeFunctionManager.parseNIT(filePath);
+		if (nit != null) {
+			ReflectUtils.getTreeByObjAttr(nit, nitRoot);
+			psiRoot.add(nitRoot);
+		} else {
+			logger.info("nit is null");
+		}
+
+		// pat表
+		DefaultMutableTreeNode patRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PAT"));
+		PAT_Table pat = NativeFunctionManager.parsePAT(filePath);
+		if (pat != null) {
+			ReflectUtils.getTreeByObjAttr(pat, patRoot);
+			psiRoot.add(patRoot);
+		} else {
+			logger.info("pat is null");
+		}
 		// 加入容器
 		JTree tree = new JTree(treeRoot);
 		jScrollPane1.setViewportView(tree);
@@ -179,9 +189,10 @@ public class MainWindow {
 	 */
 	private class ActionListener_OpenFile implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			JFileChooser jFileChooser = new JFileChooser();
-			int i = jFileChooser.showOpenDialog(null);
-			if (i == JFileChooser.APPROVE_OPTION) { // 打开文件
+			JFileChooser jFileChooser = new JFileChooser(
+					StringResocesHelper.getStringByKey("MainWindow.FileChooser.Default_Directory"));
+			int fileChooserState = jFileChooser.showOpenDialog(null);
+			if (fileChooserState == JFileChooser.APPROVE_OPTION) { // 打开文件
 				filePath = jFileChooser.getSelectedFile().getAbsolutePath();
 				fileName = jFileChooser.getSelectedFile().getName();
 				logger.info("当前文件路径：" + filePath + ";当前文件名：" + fileName);
@@ -200,7 +211,7 @@ public class MainWindow {
 		}
 
 	}
-	
+
 	/**
 	 * 关闭按钮监听类，清空界面数据
 	 * 
@@ -211,14 +222,13 @@ public class MainWindow {
 			cleanData();
 		}
 	}
-	
+
 	/**
 	 * 清空界面数据
 	 * 
 	 * @author Administrator
 	 */
-	private void cleanData()
-	{
+	private void cleanData() {
 		jpContentPanel.removeAll();
 		jpContentPanel.repaint();
 	}
