@@ -1,8 +1,8 @@
 package com.alex.ts_parser.bean.descriptor;
 
+import com.alex.ts_parser.utils.CTypeFormat2JavaType;
+
 public class TerrestrialDeliverySystemDescriptor extends Descriptor {
-	private int descriptorTag;
-	private int descriptorLength;
 	private long centreFrequency;
 	private int bandwidth;
 	private int priority;
@@ -17,15 +17,13 @@ public class TerrestrialDeliverySystemDescriptor extends Descriptor {
 	private int transmissionMode;
 	private int otherFrequencyFlag;
 	private long reservedFutureUseSecond;
-	public TerrestrialDeliverySystemDescriptor(int descriptorTag, int descriptorLength, int descriptorTag2,
-			int descriptorLength2, long centreFrequency, int bandwidth, int priority, int timeSlicingIndicator,
-			int mpeFEC_Indicator, int reservedFutureUseFirst, int constellation, int hierarchyInformation,
-			int codeRateHP_Stream, int codeRateLP_Stream, int guardInterval, int transmissionMode,
-			int otherFrequencyFlag, long reservedFutureUseSecond) {
+
+	public TerrestrialDeliverySystemDescriptor(int descriptorTag, int descriptorLength, int centreFrequency,
+			int bandwidth, int priority, int timeSlicingIndicator, int mpeFEC_Indicator, int reservedFutureUseFirst,
+			int constellation, int hierarchyInformation, int codeRateHP_Stream, int codeRateLP_Stream,
+			int guardInterval, int transmissionMode, int otherFrequencyFlag, int reservedFutureUseSecond) {
 		super(descriptorTag, descriptorLength);
-		descriptorTag = descriptorTag2;
-		descriptorLength = descriptorLength2;
-		this.centreFrequency = centreFrequency;
+		this.centreFrequency = CTypeFormat2JavaType.getUnsignedInt2Long(centreFrequency);
 		this.bandwidth = bandwidth;
 		this.priority = priority;
 		this.timeSlicingIndicator = timeSlicingIndicator;
@@ -38,23 +36,7 @@ public class TerrestrialDeliverySystemDescriptor extends Descriptor {
 		this.guardInterval = guardInterval;
 		this.transmissionMode = transmissionMode;
 		this.otherFrequencyFlag = otherFrequencyFlag;
-		this.reservedFutureUseSecond = reservedFutureUseSecond;
-	}
-
-	public int getDescriptorTag() {
-		return descriptorTag;
-	}
-
-	public void setDescriptorTag(int descriptorTag) {
-		this.descriptorTag = descriptorTag;
-	}
-
-	public int getDescriptorLength() {
-		return descriptorLength;
-	}
-
-	public void setDescriptorLength(int descriptorLength) {
-		this.descriptorLength = descriptorLength;
+		this.reservedFutureUseSecond = CTypeFormat2JavaType.getUnsignedInt2Long(reservedFutureUseSecond);
 	}
 
 	public long getCentreFrequency() {

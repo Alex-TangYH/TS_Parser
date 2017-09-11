@@ -15,6 +15,10 @@ public class ServiceListDescriptor extends Descriptor {
 		super(descriptorTag, descriptorLength);
 		this.serviceInfoArray = serviceInfoArray;
 	}
+
+	public ServiceListDescriptor(int descriptorTag, int descriptorLength) {
+		super();
+	}
 }
 
 class ServiceInfo {

@@ -15,5 +15,4 @@ public class NetworkNameDescriptor extends Descriptor {
 	public void setNetworkNameDescriptorInfo(byte[] networkNameDescriptorInfo) {
 		this.networkNameDescriptorInfo = networkNameDescriptorInfo;
 	}
-	
 }

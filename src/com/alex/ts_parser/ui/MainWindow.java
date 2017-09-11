@@ -200,6 +200,7 @@ public class MainWindow {
 					logger.info("没有选中文件");
 				} else if (TS_Utils.isTsFile(filePath)) {
 					frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title") + "   " + filePath);
+					cleanData();
 					addTree(jpContentPanel);
 				} else {
 					logger.info("不是TS文件");

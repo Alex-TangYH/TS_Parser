@@ -46,7 +46,6 @@ public class ReflectUtils {
 				} else {
 					logger.info("变量： " + varName + " = " + o);
 				}
-
 				if (!access)
 					field.setAccessible(false);
 			} catch (Exception ex) {
@@ -76,7 +75,7 @@ public class ReflectUtils {
 				Object o = field.get(obj);
 				DefaultMutableTreeNode childs = null;
 				if (o == null) {
-					logger.info(varName + "is null");
+					logger.info(String.format("%s is null", varName));
 				} else if (o.getClass().isArray()) { // 判断是否是数组
 					if (!isJavaClass(o.getClass())) {
 						Object[] arr = (Object[]) o; // 装换成数组
@@ -84,10 +83,11 @@ public class ReflectUtils {
 							varName = "描述子";
 						} else if (field.getName().equals("patProgramInfoArray")) {
 							varName = "PMT PID信息";
+						} else if (field.getName().equals("transportStreamDsecriptorArray")) {
+							varName = "TS流描述组";
 						}
 						DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
 						parentNode.add(arrayChilds);
-//						for (Object a : arr) {
 						for (int index = 0; index < arr.length; index++) {
 							Object a = arr[index];
 							if (a == null) {
@@ -97,15 +97,17 @@ public class ReflectUtils {
 								if (a instanceof Descriptor) {
 									varName = ((Descriptor) a).getDescriptorName();
 									childs = new DefaultMutableTreeNode(varName);
-									childs.add(new DefaultMutableTreeNode(
-											"descriptorTag = " + ((Descriptor) a).getDescriptorTag()));
-									childs.add(new DefaultMutableTreeNode(
-											"descriptorLength = " + ((Descriptor) a).getDescriptorLength()));
+									if(!a.getClass().getName().equals("com.alex.ts_parser.bean.descriptor.Descriptor")) {
+										childs.add(new DefaultMutableTreeNode(
+												"descriptorTag = " + ((Descriptor) a).getDescriptorTag()));
+										childs.add(new DefaultMutableTreeNode(
+												"descriptorLength = " + ((Descriptor) a).getDescriptorLength()));
+									}
 									arrayChilds.add(getTreeByObjAttr(a, childs));
 								} else {
 									varName = getObjectClassFileName(a);
-//									childs = new DefaultMutableTreeNode(varName);
-									childs = new DefaultMutableTreeNode(String.format("%s [%d]", varName,index));
+									// childs = new DefaultMutableTreeNode(varName);
+									childs = new DefaultMutableTreeNode(String.format("%s [%d]", varName, index));
 									arrayChilds.add(getTreeByObjAttr(a, childs));
 								}
 							}

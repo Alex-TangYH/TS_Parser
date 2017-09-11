@@ -1,5 +1,7 @@
 package com.alex.ts_parser.bean.descriptor;
 
+import com.alex.ts_parser.utils.CTypeFormat2JavaType;
+
 public class SatelliteDeliverySystemDescriptor extends Descriptor {
 	private long frequency;
 	private int orbitalPosition;
@@ -10,11 +12,11 @@ public class SatelliteDeliverySystemDescriptor extends Descriptor {
 	private int modulationType;
 	private int symbolRate;
 	private int fecInner;
-	public SatelliteDeliverySystemDescriptor(int descriptorTag, int descriptorLength, long frequency,
+	public SatelliteDeliverySystemDescriptor(int descriptorTag, int descriptorLength, int frequency,
 			int orbitalPosition, int westOrEastFlag, int polarization, int rollOff, int modulationSystem,
 			int modulationType, int symbolRate, int fecInner) {
 		super(descriptorTag, descriptorLength);
-		this.frequency = frequency;
+		this.frequency = CTypeFormat2JavaType.getUnsignedInt2Long(frequency);
 		this.orbitalPosition = orbitalPosition;
 		this.westOrEastFlag = westOrEastFlag;
 		this.polarization = polarization;
