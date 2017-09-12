@@ -3,8 +3,9 @@ package com.alex.ts_parser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.alex.ts_parser.bean.psi.CAT_Table;
-import com.alex.ts_parser.bean.psi.NIT_Table;
+import com.alex.ts_parser.bean.psi.PAT_ProgramInfo;
+import com.alex.ts_parser.bean.psi.PAT_Table;
+import com.alex.ts_parser.bean.psi.PMT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
 import com.alex.ts_parser.utils.ReflectUtils;
 
@@ -19,11 +20,19 @@ public class Test {
 	}
 
 	public static void TestFuction() {
-		// µ¥¶À½âÎöNIT²âÊÔÓï¾ä
-		NIT_Table nit = NativeFunctionManager.parseNIT("D:\\test\\test.ts");
-		ReflectUtils.getObjAttr(nit);
-
+		// µ¥¶À½âÎöPAT²âÊÔÓï¾ä
+		// PAT_Table pat = NativeFunctionManager.parsePAT("D:\\test\\test.ts");
+		// ReflectUtils.getObjAttr(pat);
+		// µ¥¶À½âÎöPMT²âÊÔÓï¾ä
+		PAT_Table pat = NativeFunctionManager.parsePAT("D:\\test\\test_pat_pmt.ts");
+		PMT_Table[] pmt = NativeFunctionManager.parsePMT("D:\\test\\test_pat_pmt.ts", pat.getPatProgramInfo().length,
+				pat.getPatProgramInfo());
+		ReflectUtils.getObjAttr(pmt);
 		logger.info("testFuction excute");
+		// µ¥¶À½âÎöNIT²âÊÔÓï¾ä
+		// NIT_Table nit = NativeFunctionManager.parseNIT("D:\\test\\test.ts");
+		// ReflectUtils.getObjAttr(nit);
+
 		// µ¥¶À½âÎöCAT²âÊÔÓï¾ä
 		// CAT_Table cat = NativeFunctionManager.parseCAT("D:\\test\\test.ts");
 		// ReflectUtils.getObjAttr(cat);
@@ -38,9 +47,6 @@ public class Test {
 		// JNI¸÷ÀàÐÍÍ¨ÐÅ²âÊÔÓï¾ä
 		// TestClass testClass = NativeFunctionManager.parseAge();
 
-		// µ¥¶À½âÎöPAT²âÊÔÓï¾ä
-		// PAT_Table pat = NativeFunctionManager.parsePAT("D:\\test\\test.ts");
-		// ReflectUtils.getObjAttr(pat);
 	}
 
 }

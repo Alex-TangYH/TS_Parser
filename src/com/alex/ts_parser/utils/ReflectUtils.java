@@ -58,80 +58,88 @@ public class ReflectUtils {
 		if (obj == null) {
 			DefaultMutableTreeNode nullNode = new DefaultMutableTreeNode("");
 			return nullNode;
-		}
+		} else if (obj.getClass().isArray()) {
+			Object[] arr = (Object[]) obj;
+			for (Object objElem : arr) {
+				getTreeByObjAttr(objElem, parentNode);
+			}
 
-		// 获取对象obj的所有属性域
-		Field[] fields = obj.getClass().getDeclaredFields();
+		} else {
 
-		for (Field field : fields) {
-			// 对于每个属性，获取属性名
-			String varName = field.getName();
-			try {
-				boolean access = field.isAccessible();
-				if (!access)
-					field.setAccessible(true);
+			// 获取对象obj的所有属性域
+			Field[] fields = obj.getClass().getDeclaredFields();
 
-				// 从obj中获取field变量
-				Object o = field.get(obj);
-				DefaultMutableTreeNode childs = null;
-				if (o == null) {
-					logger.info(String.format("%s is null", varName));
-				} else if (o.getClass().isArray()) { // 判断是否是数组
-					if (!isJavaClass(o.getClass())) {
-						Object[] arr = (Object[]) o; // 装换成数组
-						if (field.getName().equals("descriptorArray")) {
-							varName = "描述子";
-						} else if (field.getName().equals("patProgramInfoArray")) {
-							varName = "PMT PID信息";
-						} else if (field.getName().equals("transportStreamDsecriptorArray")) {
-							varName = "TS流描述组";
-						}
-						DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
-						parentNode.add(arrayChilds);
-						for (int index = 0; index < arr.length; index++) {
-							Object a = arr[index];
-							if (a == null) {
-								logger.info("出现空描述子对象");
-								continue;
-							} else {
-								if (a instanceof Descriptor) {
-									varName = ((Descriptor) a).getDescriptorName();
-									childs = new DefaultMutableTreeNode(varName);
-									if(!a.getClass().getName().equals("com.alex.ts_parser.bean.descriptor.Descriptor")) {
-										childs.add(new DefaultMutableTreeNode(
-												"descriptorTag = " + ((Descriptor) a).getDescriptorTag()));
-										childs.add(new DefaultMutableTreeNode(
-												"descriptorLength = " + ((Descriptor) a).getDescriptorLength()));
-									}
-									arrayChilds.add(getTreeByObjAttr(a, childs));
+			for (Field field : fields) {
+				// 对于每个属性，获取属性名
+				String varName = field.getName();
+				try {
+					boolean access = field.isAccessible();
+					if (!access)
+						field.setAccessible(true);
+
+					// 从obj中获取field变量
+					Object o = field.get(obj);
+					DefaultMutableTreeNode childs = null;
+					if (o == null) {
+						logger.info(String.format("%s is null", varName));
+					} else if (o.getClass().isArray()) { // 判断是否是数组
+						if (!isJavaClass(o.getClass())) {
+							Object[] arr = (Object[]) o; // 装换成数组
+							if (field.getName().equals("descriptorArray")) {
+								varName = "描述子";
+							} else if (field.getName().equals("patProgramInfoArray")) {
+								varName = "PMT PID信息";
+							} else if (field.getName().equals("transportStreamDsecriptorArray")) {
+								varName = "TS流描述组";
+							}
+							DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
+							parentNode.add(arrayChilds);
+							for (int index = 0; index < arr.length; index++) {
+								Object a = arr[index];
+								if (a == null) {
+									logger.info("出现空描述子对象");
+									continue;
 								} else {
-									varName = getObjectClassFileName(a);
-									// childs = new DefaultMutableTreeNode(varName);
-									childs = new DefaultMutableTreeNode(String.format("%s [%d]", varName, index));
-									arrayChilds.add(getTreeByObjAttr(a, childs));
+									if (a instanceof Descriptor) {
+										varName = ((Descriptor) a).getDescriptorName();
+										childs = new DefaultMutableTreeNode(varName);
+
+										if (!a.getClass().getName()
+												.equals("com.alex.ts_parser.bean.descriptor.Descriptor")) {
+											childs.add(new DefaultMutableTreeNode(
+													"descriptorTag = " + ((Descriptor) a).getDescriptorTag()));
+											childs.add(new DefaultMutableTreeNode(
+													"descriptorLength = " + ((Descriptor) a).getDescriptorLength()));
+										}
+										arrayChilds.add(getTreeByObjAttr(a, childs));
+									} else {
+										varName = getObjectClassFileName(a);
+										childs = new DefaultMutableTreeNode(String.format("%s [%d]", varName, index));
+										arrayChilds.add(getTreeByObjAttr(a, childs));
+									}
 								}
 							}
+						} else {
+							Class<?> cla = o.getClass();
+							if (cla.getName().equals("[B")) {
+								logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
+								childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((byte[]) o));
+								parentNode.add(childs);
+							}
 						}
+					} else if (!isJavaClass(o.getClass())) {
+						childs = new DefaultMutableTreeNode(varName);
+						getTreeByObjAttr(o, childs);
+						parentNode.add(childs);
 					} else {
-						Class<?> cla = o.getClass();
-						if (cla.getName().equals("[B")) {
-							logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
-							childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((byte[]) o));
-							parentNode.add(childs);
-						}
+						childs = new DefaultMutableTreeNode(varName + " = " + o);
+						parentNode.add(childs);
 					}
-				} else if (!isJavaClass(o.getClass())) {
-					childs = new DefaultMutableTreeNode(varName);
-					getTreeByObjAttr(o, childs);
-					parentNode.add(childs);
-				} else {
-					childs = new DefaultMutableTreeNode(varName + " = " + o);
-					parentNode.add(childs);
+					if (!access)
+						field.setAccessible(false);
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
-				if (!access)
-					field.setAccessible(false);
-			} catch (Exception ex) {
-				ex.printStackTrace();
 			}
 		}
 		return parentNode;

@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import com.alex.ts_parser.bean.psi.CAT_Table;
 import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
+import com.alex.ts_parser.bean.psi.PMT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
 import com.alex.ts_parser.utils.ReflectUtils;
 import com.alex.ts_parser.utils.StringResocesHelper;
@@ -176,6 +177,18 @@ public class MainWindow {
 		} else {
 			logger.info("pat is null");
 		}
+
+		// todo 添加PMT表结构
+		DefaultMutableTreeNode pmtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PMT"));
+		PMT_Table[] pmt = NativeFunctionManager.parsePMT(filePath, pat.getPatProgramInfo().length,
+				pat.getPatProgramInfo());
+		if (pmt != null) {
+			ReflectUtils.getTreeByObjAttr(pmt, pmtRoot);
+			psiRoot.add(pmtRoot);
+		} else {
+			logger.info("pmt is null");
+		}
+
 		// 加入容器
 		JTree tree = new JTree(treeRoot);
 		jScrollPane1.setViewportView(tree);
