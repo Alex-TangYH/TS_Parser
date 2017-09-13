@@ -60,12 +60,15 @@ public class ReflectUtils {
 			return nullNode;
 		} else if (obj.getClass().isArray()) {
 			Object[] arr = (Object[]) obj;
-			for (Object objElem : arr) {
-				getTreeByObjAttr(objElem, parentNode);
+			for (int i = 0; i < arr.length; i++) {
+				Object objElem = arr[i];
+				DefaultMutableTreeNode objNode = new DefaultMutableTreeNode(
+						String.format("%s [%d]", getObjectClassFileName(objElem), i));
+				getTreeByObjAttr(objElem, objNode);
+				parentNode.add(objNode);
 			}
 
 		} else {
-
 			// 获取对象obj的所有属性域
 			Field[] fields = obj.getClass().getDeclaredFields();
 
@@ -85,7 +88,9 @@ public class ReflectUtils {
 					} else if (o.getClass().isArray()) { // 判断是否是数组
 						if (!isJavaClass(o.getClass())) {
 							Object[] arr = (Object[]) o; // 装换成数组
-							if (field.getName().equals("descriptorArray")) {
+							if (arr.length == 0) {
+								continue;
+							} else if (field.getName().equals("descriptorArray")) {
 								varName = "描述子";
 							} else if (field.getName().equals("patProgramInfoArray")) {
 								varName = "PMT PID信息";
