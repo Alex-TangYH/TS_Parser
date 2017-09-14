@@ -23,6 +23,8 @@ import com.alex.ts_parser.bean.psi.CAT_Table;
 import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.bean.psi.PMT_Table;
+import com.alex.ts_parser.bean.si.TDT_Table;
+import com.alex.ts_parser.bean.si.TOT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
 import com.alex.ts_parser.utils.ReflectUtils;
 import com.alex.ts_parser.utils.StringResocesHelper;
@@ -138,16 +140,27 @@ public class MainWindow {
 	 * @param jPanel
 	 */
 	private void addTree(JPanel jPanel) {
-		// TODO 将各个表解析后放入jtree
 		JScrollPane jScrollPane1 = new JScrollPane();
-
 		// 树根
 		DefaultMutableTreeNode treeRoot = new DefaultMutableTreeNode();
-		DefaultMutableTreeNode psiRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI"));
-		DefaultMutableTreeNode siRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI"));
-		treeRoot.add(psiRoot);
-		treeRoot.add(siRoot);
 
+		addPsiTableNode(treeRoot);
+		addSiTableNode(treeRoot);
+
+		// 加入容器
+		JTree tree = new JTree(treeRoot);
+		jScrollPane1.setViewportView(tree);
+		jPanel.add(jScrollPane1);
+	}
+
+	/**
+	 * 添加PSI表到treeRoot
+	 * 
+	 * @param treeRoot
+	 */
+	private void addPsiTableNode(DefaultMutableTreeNode treeRoot) {
+		DefaultMutableTreeNode psiRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI"));
+		treeRoot.add(psiRoot);
 		// cat表
 		DefaultMutableTreeNode catRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.CAT"));
 		CAT_Table cat = NativeFunctionManager.parseCAT(filePath);
@@ -178,7 +191,7 @@ public class MainWindow {
 			logger.info("pat is null");
 		}
 
-		// todo 添加PMT表结构
+		// 添加PMT表结构
 		DefaultMutableTreeNode pmtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PMT"));
 		PMT_Table[] pmt = NativeFunctionManager.parsePMT(filePath, pat.getPatProgramInfo().length,
 				pat.getPatProgramInfo());
@@ -188,11 +201,36 @@ public class MainWindow {
 		} else {
 			logger.info("pmt is null");
 		}
+	}
 
-		// 加入容器
-		JTree tree = new JTree(treeRoot);
-		jScrollPane1.setViewportView(tree);
-		jPanel.add(jScrollPane1);
+	/**
+	 * 添加si表树到treeRoot节点
+	 * 
+	 * @param treeRoot
+	 */
+	private void addSiTableNode(DefaultMutableTreeNode treeRoot) {
+		DefaultMutableTreeNode siRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI"));
+		treeRoot.add(siRoot);
+
+		// tdt表
+		DefaultMutableTreeNode tdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.TDT"));
+		TDT_Table tdt = NativeFunctionManager.parseTDT(filePath);
+		if (tdt != null) {
+			ReflectUtils.getTreeByObjAttr(tdt, tdtRoot);
+			siRoot.add(tdtRoot);
+		} else {
+			logger.info("tdt is null");
+		}
+
+		// tot表
+		DefaultMutableTreeNode totRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.TOT"));
+		TOT_Table tot = NativeFunctionManager.parseTOT(filePath);
+		if (tot != null) {
+			ReflectUtils.getTreeByObjAttr(tot, totRoot);
+			siRoot.add(totRoot);
+		} else {
+			logger.info("tot is null");
+		}
 	}
 
 	/**

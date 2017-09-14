@@ -41,6 +41,8 @@ public class ReflectUtils {
 						Class<?> cla = o.getClass();
 						if (cla.getName().equals("[B")) {
 							logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
+						}else if(cla.getName().equals("[J")){
+							logger.info("变量： " + varName + " = " + Arrays.toString((long[]) o));
 						}
 					}
 				} else {
@@ -131,6 +133,10 @@ public class ReflectUtils {
 							if (cla.getName().equals("[B")) {
 								logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
 								childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((byte[]) o));
+								parentNode.add(childs);
+							}else if(cla.getName().equals("[J")){
+								logger.info("变量： " + varName + " = " + Arrays.toString((long[]) o));
+								childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((long[]) o));
 								parentNode.add(childs);
 							}
 						}
