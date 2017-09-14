@@ -62,10 +62,12 @@ public class ReflectUtils {
 			Object[] arr = (Object[]) obj;
 			for (int i = 0; i < arr.length; i++) {
 				Object objElem = arr[i];
-				DefaultMutableTreeNode objNode = new DefaultMutableTreeNode(
-						String.format("%s [%d]", getObjectClassFileName(objElem), i));
-				getTreeByObjAttr(objElem, objNode);
-				parentNode.add(objNode);
+				if (objElem != null) {
+					DefaultMutableTreeNode objNode = new DefaultMutableTreeNode(
+							String.format("%s [%d]", getObjectClassFileName(objElem), i));
+					getTreeByObjAttr(objElem, objNode);
+					parentNode.add(objNode);
+				}
 			}
 
 		} else {

@@ -1,19 +1,19 @@
 package com.alex.ts_parser.bean.descriptor;
 
 public class TeletextDescriptor extends Descriptor {
-	private TeletextInfo[] teletextInfo;
+	private TeletextInfo[] teletextInfoArray;
 
-	public TeletextDescriptor(int descriptorTag, int descriptorLength, TeletextInfo[] teletextInfo) {
+	public TeletextDescriptor(int descriptorTag, int descriptorLength, TeletextInfo[] teletextInfoArray) {
 		super(descriptorTag, descriptorLength);
-		this.teletextInfo = teletextInfo;
+		this.teletextInfoArray = teletextInfoArray;
 	}
 
 	public TeletextInfo[] getTeletextInfo() {
-		return teletextInfo;
+		return teletextInfoArray;
 	}
 
-	public void setTeletextInfo(TeletextInfo[] teletextInfo) {
-		this.teletextInfo = teletextInfo;
+	public void setTeletextInfo(TeletextInfo[] teletextInfoArray) {
+		this.teletextInfoArray = teletextInfoArray;
 	}
 	
 }
