@@ -8,7 +8,12 @@ import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.bean.psi.PMT_Table;
 import com.alex.ts_parser.bean.psi.TestClass;
+import com.alex.ts_parser.bean.si.BAT_Table;
+import com.alex.ts_parser.bean.si.DIT_Table;
+import com.alex.ts_parser.bean.si.EIT_Table;
 import com.alex.ts_parser.bean.si.SDT_Table;
+import com.alex.ts_parser.bean.si.SIT_Table;
+import com.alex.ts_parser.bean.si.ST_Table;
 import com.alex.ts_parser.bean.si.TDT_Table;
 import com.alex.ts_parser.bean.si.TOT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
@@ -26,7 +31,7 @@ public class Test {
 	}
 
 	public static void testFuction() {
-		testParseSDT();
+//		testParseSDT(); //Î´Íê³É×Ó½á¹¹½âÎö
 		logger.info("testFuction excute");
 	}
 
@@ -103,10 +108,50 @@ public class Test {
 	}
 	
 	/**
-	 * µ¥¶À½âÎöTOT²âÊÔÓï¾ä
+	 * µ¥¶À½âÎöSDT²âÊÔÓï¾ä
 	 */
 	private static void testParseSDT() {
 		SDT_Table sdt = NativeFunctionManager.parseSDT(filePath);
 		ReflectUtils.getObjAttr(sdt);
+	}
+	
+	/**
+	 * µ¥¶À½âÎöBAT²âÊÔÓï¾ä
+	 */
+	private static void testParseBAT() {
+		BAT_Table bat = NativeFunctionManager.parseBAT(filePath);
+		ReflectUtils.getObjAttr(bat);
+	}
+	
+	/**
+	 * µ¥¶À½âÎöDIT²âÊÔÓï¾ä
+	 */
+	private static void testParseDIT() {
+		DIT_Table dit = NativeFunctionManager.parseDIT(filePath);
+		ReflectUtils.getObjAttr(dit);
+	}
+	
+	/**
+	 * µ¥¶À½âÎöEIT²âÊÔÓï¾ä
+	 */
+	private static void testParseEIT() {
+		EIT_Table eit = NativeFunctionManager.parseEIT(filePath);
+		ReflectUtils.getObjAttr(eit);
+	}
+	
+	/**
+	 * µ¥¶À½âÎöSIT²âÊÔÓï¾ä
+	 */
+	private static void testParseSIT() {
+		SIT_Table sit = NativeFunctionManager.parseSIT(filePath);
+		ReflectUtils.getObjAttr(sit);
+	}
+	
+	/**
+	 * µ¥¶À½âÎöST²âÊÔÓï¾ä
+	 */
+	private static void testParseST() {
+		ST_Table st = NativeFunctionManager.parseST(filePath);
+		ReflectUtils.getObjAttr(st);
 	}
 }
