@@ -23,7 +23,9 @@ import com.alex.ts_parser.bean.psi.CAT_Table;
 import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.bean.psi.PMT_Table;
+import com.alex.ts_parser.bean.si.DIT_Table;
 import com.alex.ts_parser.bean.si.SDT_Table;
+import com.alex.ts_parser.bean.si.ST_Table;
 import com.alex.ts_parser.bean.si.TDT_Table;
 import com.alex.ts_parser.bean.si.TOT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
@@ -241,6 +243,26 @@ public class MainWindow {
 			siRoot.add(totRoot);
 		} else {
 			logger.info("tot is null");
+		}
+
+		// st±í
+		DefaultMutableTreeNode stRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.ST"));
+		ST_Table st = NativeFunctionManager.parseST(filePath);
+		if (st != null) {
+			ReflectUtils.getTreeByObjAttr(st, stRoot);
+			siRoot.add(stRoot);
+		} else {
+			logger.info("st is null");
+		}
+
+		// dit±í
+		DefaultMutableTreeNode ditRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.DIT"));
+		DIT_Table dit = NativeFunctionManager.parseDIT(filePath);
+		if (dit != null) {
+			ReflectUtils.getTreeByObjAttr(dit, ditRoot);
+			siRoot.add(ditRoot);
+		} else {
+			logger.info("st is null");
 		}
 	}
 
