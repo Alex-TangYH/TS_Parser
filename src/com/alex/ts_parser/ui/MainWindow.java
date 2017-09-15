@@ -23,6 +23,7 @@ import com.alex.ts_parser.bean.psi.CAT_Table;
 import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.bean.psi.PMT_Table;
+import com.alex.ts_parser.bean.si.SDT_Table;
 import com.alex.ts_parser.bean.si.TDT_Table;
 import com.alex.ts_parser.bean.si.TOT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
@@ -36,7 +37,7 @@ public class MainWindow {
 	private JPanel jpContentPanel;
 	private JMenuBar jmbMainMenuBar;
 	private JPanel jpBottomPanel;
-	private Logger logger = LogManager.getLogger("");
+	private Logger logger = LogManager.getLogger("MainWindow");
 	private String filePath = null;
 	private String fileName = null;
 
@@ -211,6 +212,16 @@ public class MainWindow {
 	private void addSiTableNode(DefaultMutableTreeNode treeRoot) {
 		DefaultMutableTreeNode siRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI"));
 		treeRoot.add(siRoot);
+
+		// sdt±í
+		DefaultMutableTreeNode sdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.SDT"));
+		SDT_Table sdt = NativeFunctionManager.parseSDT(filePath);
+		if (sdt != null) {
+			ReflectUtils.getTreeByObjAttr(sdt, sdtRoot);
+			siRoot.add(sdtRoot);
+		} else {
+			logger.info("sdt is null");
+		}
 
 		// tdt±í
 		DefaultMutableTreeNode tdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.TDT"));

@@ -8,6 +8,7 @@ import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.bean.psi.PMT_Table;
 import com.alex.ts_parser.bean.psi.TestClass;
+import com.alex.ts_parser.bean.si.SDT_Table;
 import com.alex.ts_parser.bean.si.TDT_Table;
 import com.alex.ts_parser.bean.si.TOT_Table;
 import com.alex.ts_parser.native_function.NativeFunctionManager;
@@ -15,8 +16,8 @@ import com.alex.ts_parser.utils.ReflectUtils;
 import com.alex.ts_parser.utils.StringResocesHelper;
 
 public class Test {
-	private static Logger logger = LogManager.getLogger("");
-
+	private static Logger logger = LogManager.getLogger("Test");
+	private static String filePath = "D:\\test\\program.ts";
 	public Test() {
 	}
 
@@ -25,7 +26,7 @@ public class Test {
 	}
 
 	public static void testFuction() {
-		testParseTOT();
+		testParseSDT();
 		logger.info("testFuction excute");
 	}
 
@@ -48,14 +49,14 @@ public class Test {
 	 * ÊäÈëÂ·¾¶½âÎöTSÁ÷ÎÄ¼þ²âÊÔÓï¾ä
 	 */
 	private static void testParseTSFileNative() {
-		NativeFunctionManager.parseTSFileNative("D:\\test\\test.ts");
+		NativeFunctionManager.parseTSFileNative(filePath);
 	}
 
 	/**
 	 * µ¥¶À½âÎöCAT²âÊÔÓï¾ä
 	 */
 	private static void testParseCAT() {
-		CAT_Table cat = NativeFunctionManager.parseCAT("D:\\test\\test.ts");
+		CAT_Table cat = NativeFunctionManager.parseCAT(filePath);
 		ReflectUtils.getObjAttr(cat);
 	}
 
@@ -63,7 +64,7 @@ public class Test {
 	 * µ¥¶À½âÎöNIT²âÊÔÓï¾ä
 	 */
 	private static void testParseNIT() {
-		NIT_Table nit = NativeFunctionManager.parseNIT("D:\\test\\test.ts");
+		NIT_Table nit = NativeFunctionManager.parseNIT(filePath);
 		ReflectUtils.getObjAttr(nit);
 	}
 
@@ -71,7 +72,7 @@ public class Test {
 	 * µ¥¶À½âÎöPAT²âÊÔÓï¾ä
 	 */
 	private static void testParsePAT() {
-		PAT_Table pat = NativeFunctionManager.parsePAT("D:\\test\\test.ts");
+		PAT_Table pat = NativeFunctionManager.parsePAT(filePath);
 		ReflectUtils.getObjAttr(pat);
 	}
 
@@ -79,8 +80,8 @@ public class Test {
 	 * µ¥¶À½âÎöPMT²âÊÔÓï¾ä
 	 */
 	private static void testParsePMT() {
-		PAT_Table pat = NativeFunctionManager.parsePAT("D:\\test\\1524.ts");
-		PMT_Table[] pmt = NativeFunctionManager.parsePMT("D:\\test\\1524.ts", pat.getPatProgramInfo().length,
+		PAT_Table pat = NativeFunctionManager.parsePAT(filePath);
+		PMT_Table[] pmt = NativeFunctionManager.parsePMT(filePath, pat.getPatProgramInfo().length,
 				pat.getPatProgramInfo());
 		ReflectUtils.getObjAttr(pmt);
 	}
@@ -89,7 +90,7 @@ public class Test {
 	 * µ¥¶À½âÎöTDT²âÊÔÓï¾ä
 	 */
 	private static void testParseTDT() {
-		TDT_Table tdt = NativeFunctionManager.parseTDT("D:\\test\\1524.ts");
+		TDT_Table tdt = NativeFunctionManager.parseTDT(filePath);
 		ReflectUtils.getObjAttr(tdt);
 	}
 	
@@ -97,7 +98,15 @@ public class Test {
 	 * µ¥¶À½âÎöTOT²âÊÔÓï¾ä
 	 */
 	private static void testParseTOT() {
-		TOT_Table tdt = NativeFunctionManager.parseTOT("D:\\test\\1524.ts");
+		TOT_Table tdt = NativeFunctionManager.parseTOT(filePath);
 		ReflectUtils.getObjAttr(tdt);
+	}
+	
+	/**
+	 * µ¥¶À½âÎöTOT²âÊÔÓï¾ä
+	 */
+	private static void testParseSDT() {
+		SDT_Table sdt = NativeFunctionManager.parseSDT(filePath);
+		ReflectUtils.getObjAttr(sdt);
 	}
 }
