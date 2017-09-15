@@ -19,11 +19,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.alex.ts_parser.AddTableThread;
 import com.alex.ts_parser.bean.psi.CAT_Table;
 import com.alex.ts_parser.bean.psi.NIT_Table;
 import com.alex.ts_parser.bean.psi.PAT_Table;
 import com.alex.ts_parser.bean.psi.PMT_Table;
 import com.alex.ts_parser.bean.si.DIT_Table;
+import com.alex.ts_parser.bean.si.RST_Table;
 import com.alex.ts_parser.bean.si.SDT_Table;
 import com.alex.ts_parser.bean.si.ST_Table;
 import com.alex.ts_parser.bean.si.TDT_Table;
@@ -164,46 +166,34 @@ public class MainWindow {
 	private void addPsiTableNode(DefaultMutableTreeNode treeRoot) {
 		DefaultMutableTreeNode psiRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI"));
 		treeRoot.add(psiRoot);
+
 		// cat表
 		DefaultMutableTreeNode catRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.CAT"));
-		CAT_Table cat = NativeFunctionManager.parseCAT(filePath);
-		if (cat != null) {
-			ReflectUtils.getTreeByObjAttr(cat, catRoot);
-			psiRoot.add(catRoot);
-		} else {
-			logger.info("cat is null");
-		}
+		psiRoot.add(catRoot);
+		AddTableThread addCatTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.CAT"), catRoot,
+				filePath);
+		addCatTableThread.start();
 
 		// nit表
 		DefaultMutableTreeNode nitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.NIT"));
-		NIT_Table nit = NativeFunctionManager.parseNIT(filePath);
-		if (nit != null) {
-			ReflectUtils.getTreeByObjAttr(nit, nitRoot);
-			psiRoot.add(nitRoot);
-		} else {
-			logger.info("nit is null");
-		}
+		psiRoot.add(nitRoot);
+		AddTableThread addNitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.NIT"), nitRoot,
+				filePath);
+		addNitTableThread.start();
 
 		// pat表
 		DefaultMutableTreeNode patRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PAT"));
-		PAT_Table pat = NativeFunctionManager.parsePAT(filePath);
-		if (pat != null) {
-			ReflectUtils.getTreeByObjAttr(pat, patRoot);
-			psiRoot.add(patRoot);
-		} else {
-			logger.info("pat is null");
-		}
+		psiRoot.add(patRoot);
+		AddTableThread addPatTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.PAT"), patRoot,
+				filePath);
+		addPatTableThread.start();
 
-		// 添加PMT表结构
+		// pmt表
 		DefaultMutableTreeNode pmtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PMT"));
-		PMT_Table[] pmt = NativeFunctionManager.parsePMT(filePath, pat.getPatProgramInfo().length,
-				pat.getPatProgramInfo());
-		if (pmt != null) {
-			ReflectUtils.getTreeByObjAttr(pmt, pmtRoot);
-			psiRoot.add(pmtRoot);
-		} else {
-			logger.info("pmt is null");
-		}
+		psiRoot.add(pmtRoot);
+		AddTableThread addPmtTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.PMT"), pmtRoot,
+				filePath);
+		addPmtTableThread.start();
 	}
 
 	/**
@@ -217,53 +207,45 @@ public class MainWindow {
 
 		// sdt表
 		DefaultMutableTreeNode sdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.SDT"));
-		SDT_Table sdt = NativeFunctionManager.parseSDT(filePath);
-		if (sdt != null) {
-			ReflectUtils.getTreeByObjAttr(sdt, sdtRoot);
-			siRoot.add(sdtRoot);
-		} else {
-			logger.info("sdt is null");
-		}
+		siRoot.add(sdtRoot);
+		AddTableThread addSdtTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.SDT"), sdtRoot,
+				filePath);
+		addSdtTableThread.start();
 
 		// tdt表
 		DefaultMutableTreeNode tdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.TDT"));
-		TDT_Table tdt = NativeFunctionManager.parseTDT(filePath);
-		if (tdt != null) {
-			ReflectUtils.getTreeByObjAttr(tdt, tdtRoot);
-			siRoot.add(tdtRoot);
-		} else {
-			logger.info("tdt is null");
-		}
+		siRoot.add(tdtRoot);
+		AddTableThread addTdtTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.TDT"), tdtRoot,
+				filePath);
+		addTdtTableThread.start();
 
 		// tot表
 		DefaultMutableTreeNode totRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.TOT"));
-		TOT_Table tot = NativeFunctionManager.parseTOT(filePath);
-		if (tot != null) {
-			ReflectUtils.getTreeByObjAttr(tot, totRoot);
-			siRoot.add(totRoot);
-		} else {
-			logger.info("tot is null");
-		}
+		siRoot.add(totRoot);
+		AddTableThread addTotTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.TOT"), totRoot,
+				filePath);
+		addTotTableThread.start();
 
 		// st表
 		DefaultMutableTreeNode stRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.ST"));
-		ST_Table st = NativeFunctionManager.parseST(filePath);
-		if (st != null) {
-			ReflectUtils.getTreeByObjAttr(st, stRoot);
-			siRoot.add(stRoot);
-		} else {
-			logger.info("st is null");
-		}
+		siRoot.add(stRoot);
+		AddTableThread addStTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.ST"), stRoot,
+				filePath);
+		addStTableThread.start();
 
 		// dit表
 		DefaultMutableTreeNode ditRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.DIT"));
-		DIT_Table dit = NativeFunctionManager.parseDIT(filePath);
-		if (dit != null) {
-			ReflectUtils.getTreeByObjAttr(dit, ditRoot);
-			siRoot.add(ditRoot);
-		} else {
-			logger.info("st is null");
-		}
+		siRoot.add(ditRoot);
+		AddTableThread addDitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.DIT"), ditRoot,
+				filePath);
+		addDitTableThread.start();
+
+		// rst表
+		DefaultMutableTreeNode rstRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.RST"));
+		siRoot.add(rstRoot);
+		AddTableThread addRstTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.RST"), rstRoot,
+				filePath);
+		addRstTableThread.start();
 	}
 
 	/**

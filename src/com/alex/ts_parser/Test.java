@@ -11,6 +11,7 @@ import com.alex.ts_parser.bean.psi.TestClass;
 import com.alex.ts_parser.bean.si.BAT_Table;
 import com.alex.ts_parser.bean.si.DIT_Table;
 import com.alex.ts_parser.bean.si.EIT_Table;
+import com.alex.ts_parser.bean.si.RST_Table;
 import com.alex.ts_parser.bean.si.SDT_Table;
 import com.alex.ts_parser.bean.si.SIT_Table;
 import com.alex.ts_parser.bean.si.ST_Table;
@@ -32,6 +33,7 @@ public class Test {
 
 	public static void testFuction() {
 //		testParseSDT(); //未完成子结构解析
+		testParseRST(); 
 		logger.info("testFuction excute");
 	}
 
@@ -153,5 +155,13 @@ public class Test {
 	private static void testParseST() {
 		ST_Table st = NativeFunctionManager.parseST(filePath);
 		ReflectUtils.getObjAttr(st);
+	}
+	
+	/**
+	 * 单独解析RST测试语句
+	 */
+	private static void testParseRST() {
+		RST_Table rst = NativeFunctionManager.parseRST(filePath);
+		ReflectUtils.getObjAttr(rst);
 	}
 }

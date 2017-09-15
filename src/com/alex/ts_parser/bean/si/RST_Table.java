@@ -3,16 +3,16 @@ package com.alex.ts_parser.bean.si;
 public class RST_Table {
 	private int tableId;
 	private int sectionSyntaxIndicator;
-	private int reservedFutureUseFirst;
+	private int reservedFutureUse;
 	private int reserved;
 	private int sectionLength;
 	private RstInfo[] rstInfo;
-	public RST_Table(int tableId, int sectionSyntaxIndicator, int reservedFutureUseFirst, int reserved,
+	public RST_Table(int tableId, int sectionSyntaxIndicator, int reservedFutureUse, int reserved,
 			int sectionLength, RstInfo[] rstInfo) {
 		super();
 		this.tableId = tableId;
 		this.sectionSyntaxIndicator = sectionSyntaxIndicator;
-		this.reservedFutureUseFirst = reservedFutureUseFirst;
+		this.reservedFutureUse = reservedFutureUse;
 		this.reserved = reserved;
 		this.sectionLength = sectionLength;
 		this.rstInfo = rstInfo;
@@ -29,11 +29,11 @@ public class RST_Table {
 	public void setSectionSyntaxIndicator(int sectionSyntaxIndicator) {
 		this.sectionSyntaxIndicator = sectionSyntaxIndicator;
 	}
-	public int getReservedFutureUseFirst() {
-		return reservedFutureUseFirst;
+	public int getReservedFutureUse() {
+		return reservedFutureUse;
 	}
-	public void setReservedFutureUseFirst(int reservedFutureUseFirst) {
-		this.reservedFutureUseFirst = reservedFutureUseFirst;
+	public void setReservedFutureUse(int reservedFutureUse) {
+		this.reservedFutureUse = reservedFutureUse;
 	}
 	public int getReserved() {
 		return reserved;
