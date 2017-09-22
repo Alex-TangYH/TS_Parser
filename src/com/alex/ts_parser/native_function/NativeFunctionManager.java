@@ -21,7 +21,11 @@ public class NativeFunctionManager {
 	static {
 		System.loadLibrary(StringResocesHelper.getStringByKey("C_Parser_Lib"));
 	}
-
+	public static final int EIT_PF_ACTUAL = 1;
+	public static final int EIT_OTHER_50 = 2;
+	public static final int EIT_OTHER_51 = 3;
+	
+	
 	public native static int parseTSFileNative(String filePath);
 
 	public native static TestClass parseAge();
@@ -48,7 +52,7 @@ public class NativeFunctionManager {
 
 	public native static DIT_Table parseDIT(String filePath);
 
-	public native static EIT_Table parseEIT(String filePath);
+	public native static EIT_Table[] parseEIT(String filePath, int eitType);
 
 	public native static RST_Table parseRST(String filePath);
 

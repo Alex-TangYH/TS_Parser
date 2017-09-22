@@ -19,8 +19,8 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainWindow window = new MainWindow();
-					window.frmTs.setVisible(true);
+					MainWindow mainWindow = new MainWindow();
+					mainWindow.frmTs.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

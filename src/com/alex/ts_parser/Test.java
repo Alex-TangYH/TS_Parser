@@ -23,7 +23,7 @@ import com.alex.ts_parser.utils.StringResocesHelper;
 
 public class Test {
 	private static Logger logger = LogManager.getLogger("Test");
-	private static String filePath = "D:\\test\\program.ts";
+	private static String filePath = "D:\\test\\test_ca.ts";
 	public Test() {
 	}
 
@@ -32,8 +32,8 @@ public class Test {
 	}
 
 	public static void testFuction() {
-//		testParseSDT(); //未完成子结构解析
-		testParseRST(); 
+//		testParseSIT(); 底层方法有问题 
+		testParseEIT();
 		logger.info("testFuction excute");
 	}
 
@@ -137,8 +137,10 @@ public class Test {
 	 * 单独解析EIT测试语句
 	 */
 	private static void testParseEIT() {
-		EIT_Table eit = NativeFunctionManager.parseEIT(filePath);
-		ReflectUtils.getObjAttr(eit);
+		EIT_Table[] eitArray = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_PF_ACTUAL);
+		ReflectUtils.getObjAttr(eitArray);
+		EIT_Table[] eitArray2 = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_OTHER_50);
+		ReflectUtils.getObjAttr(eitArray2);
 	}
 	
 	/**

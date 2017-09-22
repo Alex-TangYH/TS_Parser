@@ -15,36 +15,27 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alex.ts_parser.AddTableThread;
-import com.alex.ts_parser.bean.psi.CAT_Table;
-import com.alex.ts_parser.bean.psi.NIT_Table;
-import com.alex.ts_parser.bean.psi.PAT_Table;
-import com.alex.ts_parser.bean.psi.PMT_Table;
-import com.alex.ts_parser.bean.si.DIT_Table;
-import com.alex.ts_parser.bean.si.RST_Table;
-import com.alex.ts_parser.bean.si.SDT_Table;
-import com.alex.ts_parser.bean.si.ST_Table;
-import com.alex.ts_parser.bean.si.TDT_Table;
-import com.alex.ts_parser.bean.si.TOT_Table;
-import com.alex.ts_parser.native_function.NativeFunctionManager;
-import com.alex.ts_parser.utils.ReflectUtils;
 import com.alex.ts_parser.utils.StringResocesHelper;
 import com.alex.ts_parser.utils.TS_Utils;
 
 public class MainWindow {
 
 	public JFrame frmTs;
-	private JPanel jpContentPanel;
+	private static JPanel jpContentPanel;
 	private JMenuBar jmbMainMenuBar;
 	private JPanel jpBottomPanel;
 	private Logger logger = LogManager.getLogger("MainWindow");
 	private String filePath = null;
 	private String fileName = null;
-
+	public static DefaultMutableTreeNode treeRoot;
+	private static DefaultTreeModel treeModel;
+	private JTree jTree;
 	/**
 	 * Create the application.
 	 */
@@ -147,14 +138,16 @@ public class MainWindow {
 	private void addTree(JPanel jPanel) {
 		JScrollPane jScrollPane1 = new JScrollPane();
 		// 树根
-		DefaultMutableTreeNode treeRoot = new DefaultMutableTreeNode();
-
+		treeRoot = new DefaultMutableTreeNode();
+		
+		jTree = new JTree(treeRoot);
+		treeModel = (DefaultTreeModel) jTree.getModel();  
+		
 		addPsiTableNode(treeRoot);
 		addSiTableNode(treeRoot);
 
 		// 加入容器
-		JTree tree = new JTree(treeRoot);
-		jScrollPane1.setViewportView(tree);
+		jScrollPane1.setViewportView(jTree);
 		jPanel.add(jScrollPane1);
 	}
 
@@ -204,7 +197,7 @@ public class MainWindow {
 	private void addSiTableNode(DefaultMutableTreeNode treeRoot) {
 		DefaultMutableTreeNode siRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI"));
 		treeRoot.add(siRoot);
-
+		
 		// sdt表
 		DefaultMutableTreeNode sdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.SDT"));
 		siRoot.add(sdtRoot);
@@ -246,6 +239,41 @@ public class MainWindow {
 		AddTableThread addRstTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.RST"), rstRoot,
 				filePath);
 		addRstTableThread.start();
+
+		// sit表
+		DefaultMutableTreeNode sitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.SIT"));
+		siRoot.add(sitRoot);
+		AddTableThread addSitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.SIT"), sitRoot,
+				filePath);
+		addSitTableThread.start();
+
+		// eit表
+		DefaultMutableTreeNode eitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT"));
+		siRoot.add(eitRoot);
+		AddTableThread addEitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT"), eitRoot,
+				filePath);
+		addEitTableThread.start();
+
+		// eit表(0x50)
+		DefaultMutableTreeNode eitOther50Root = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_50"));
+		siRoot.add(eitOther50Root);
+		AddTableThread addEitOther50TableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_50"), eitOther50Root,
+				filePath);
+		addEitOther50TableThread.start();
+		
+		// eit表(0x51)
+		DefaultMutableTreeNode eitOther51Root = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_51"));
+		siRoot.add(eitOther51Root);
+		AddTableThread addEitOther51TableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_51"), eitOther51Root,
+				filePath);
+		addEitOther51TableThread.start();
+		
+		// bat表
+		DefaultMutableTreeNode batRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.BAT"));
+		siRoot.add(batRoot);
+		AddTableThread addBatTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.BAT"), batRoot,
+				filePath);
+		addBatTableThread.start();
 	}
 
 	/**
@@ -276,7 +304,6 @@ public class MainWindow {
 			}
 			logger.info(filePath);
 		}
-
 	}
 
 	/**
@@ -298,5 +325,14 @@ public class MainWindow {
 	private void cleanData() {
 		jpContentPanel.removeAll();
 		jpContentPanel.repaint();
+	}
+	
+	/**
+	 * 刷新PSI/SI界面数据
+	 * 
+	 * @author Administrator
+	 */
+	public static void reflashData() {
+		treeModel.reload();		
 	}
 }

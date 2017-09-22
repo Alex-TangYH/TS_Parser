@@ -1,6 +1,7 @@
 package com.alex.ts_parser.bean.si;
 
 import com.alex.ts_parser.bean.descriptor.Descriptor;
+import com.alex.ts_parser.utils.CTypeFormat2JavaType;
 
 public class EIT_Table {
 	private int tableId;
@@ -23,7 +24,7 @@ public class EIT_Table {
 	public EIT_Table(int tableId, int sectionSyntaxIndicator, int reservedFutureUseFirst, int reservedFirst,
 			int sectionLength, int serviceId, int reservedSecond, int versionNumber, int currentNextIndicator,
 			int sectionNumber, int lastSectionNumber, int transportStreamId, int originalNetworkId,
-			int segmentLastSectionNumber, int lastTableId, EitInfo[] eitInfoArray, long crc32) {
+			int segmentLastSectionNumber, int lastTableId, EitInfo[] eitInfoArray, int crc32) {
 		super();
 		this.tableId = tableId;
 		this.sectionSyntaxIndicator = sectionSyntaxIndicator;
@@ -41,7 +42,7 @@ public class EIT_Table {
 		this.segmentLastSectionNumber = segmentLastSectionNumber;
 		this.lastTableId = lastTableId;
 		this.eitInfoArray = eitInfoArray;
-		this.crc32 = crc32;
+		this.crc32 = CTypeFormat2JavaType.getUnsignedInt2Long(crc32);
 	}
 	public int getTableId() {
 		return tableId;
@@ -149,8 +150,8 @@ public class EIT_Table {
 
 class EitInfo{
 	private int eventId;
-	private int[] startTimeArray;
-	private int[] duration;
+	private long[] startTimeArray;
+	private long[] duration;
 	private int runningStatus;
 	private int freeCaMode;
 	private int descriptorsLoopLength;
@@ -159,8 +160,8 @@ class EitInfo{
 			int descriptorsLoopLength, Descriptor[] descriptorArray) {
 		super();
 		this.eventId = eventId;
-		this.startTimeArray = startTimeArray;
-		this.duration = duration;
+		this.startTimeArray = CTypeFormat2JavaType.getUnsignedIntArray2LongArray(startTimeArray);
+		this.duration = CTypeFormat2JavaType.getUnsignedIntArray2LongArray(duration);
 		this.runningStatus = runningStatus;
 		this.freeCaMode = freeCaMode;
 		this.descriptorsLoopLength = descriptorsLoopLength;
@@ -172,16 +173,16 @@ class EitInfo{
 	public void setEventId(int eventId) {
 		this.eventId = eventId;
 	}
-	public int[] getStartTimeArray() {
+	public long[] getStartTimeArray() {
 		return startTimeArray;
 	}
-	public void setStartTimeArray(int[] startTimeArray) {
+	public void setStartTimeArray(long[] startTimeArray) {
 		this.startTimeArray = startTimeArray;
 	}
-	public int[] getDuration() {
+	public long[] getDuration() {
 		return duration;
 	}
-	public void setDuration(int[] duration) {
+	public void setDuration(long[] duration) {
 		this.duration = duration;
 	}
 	public int getRunningStatus() {

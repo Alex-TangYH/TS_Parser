@@ -19,6 +19,10 @@ public class DescriptorMap {
 		descriptorNameMap.put(65, "ServiceListDescriptor");
 		descriptorNameMap.put(67, "SatelliteDeliverySystemDescriptor");
 		descriptorNameMap.put(68, "CableDeliverySystemDescriptor");
+		descriptorNameMap.put(72, "ServiceDescriptor");
+		descriptorNameMap.put(74, "LinkageDescriptor");
+		descriptorNameMap.put(77, "ShortEventDescriptor");
+		descriptorNameMap.put(78, "ExtendedEventDescriptor");
 		descriptorNameMap.put(82, "StreamIndentifierDescriptor");
 		descriptorNameMap.put(86, "TeletextDescriptor");
 		descriptorNameMap.put(88, "LocalTimeOffsetDescriptor");
