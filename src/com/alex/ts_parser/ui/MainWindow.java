@@ -1,6 +1,7 @@
 package com.alex.ts_parser.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -13,6 +14,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -27,7 +29,7 @@ import com.alex.ts_parser.utils.TS_Utils;
 public class MainWindow {
 
 	public JFrame frmTs;
-	private static JPanel jpContentPanel;
+	private static JPanel psisiTreePanel;
 	private JMenuBar jmbMainMenuBar;
 	private JPanel jpBottomPanel;
 	private Logger logger = LogManager.getLogger("MainWindow");
@@ -36,6 +38,8 @@ public class MainWindow {
 	public static DefaultMutableTreeNode treeRoot;
 	private static DefaultTreeModel treeModel;
 	private JTree jTree;
+	private JTable programInfoTable;
+
 	/**
 	 * Create the application.
 	 */
@@ -75,6 +79,45 @@ public class MainWindow {
 	 * 初始化底部窗口
 	 */
 	private void initBottomPanel() {
+
+		JPanel psi_si = new JPanel();
+		psi_si.setBorder(null);
+		psi_si.setPreferredSize(new Dimension(300, 150));
+		frmTs.getContentPane().add(psi_si, BorderLayout.WEST);
+		psi_si.setLayout(new BorderLayout(0, 0));
+		JPanel psisiTitlePanel = new JPanel();
+		psi_si.add(psisiTitlePanel, BorderLayout.NORTH);
+		JLabel lbPsisiTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"));
+		psisiTitlePanel.add(lbPsisiTitle);
+		psisiTreePanel = new JPanel();
+		psi_si.add(psisiTreePanel);
+		psisiTreePanel.setLayout(new BorderLayout(0, 0));
+
+		JPanel epgPanel = new JPanel();
+		epgPanel.setBorder(null);
+		frmTs.getContentPane().add(epgPanel, BorderLayout.CENTER);
+		epgPanel.setLayout(new BorderLayout(0, 0));
+		
+		JPanel epgTitlePanel = new JPanel();
+		JLabel lbEpgTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.EPGTitle"));
+		epgTitlePanel.add(lbEpgTitle);
+		epgPanel.add(epgTitlePanel, BorderLayout.NORTH);
+		
+		JPanel epgInfoPanel = new JPanel();
+		epgPanel.add(epgInfoPanel);
+		epgInfoPanel.setLayout(new BorderLayout(0, 0));
+
+		
+		String[] columnas = {"Name", "Nickname","Age"};
+		Object[][] datos= {
+				 {"Daniel G. Machado","Dan","33"},
+				 {"jorge2","giraldo2","21"},
+				 {"jorge3","giraldo3","22"},
+				 {"Bárbara Gomes Machado","Bah","23"}
+		 };
+		programInfoTable = new JTable(datos,columnas);
+		JScrollPane scrollPane = new JScrollPane(programInfoTable);
+		epgInfoPanel.add(scrollPane, BorderLayout.CENTER);
 		jpBottomPanel = new JPanel();
 		frmTs.getContentPane().add(jpBottomPanel, BorderLayout.SOUTH);
 
@@ -89,19 +132,12 @@ public class MainWindow {
 	 * 初始化标题窗口
 	 */
 	private void initTitlePanel() {
-		JPanel titlePanel = new JPanel();
-		frmTs.getContentPane().add(titlePanel, BorderLayout.NORTH);
-		JLabel lbTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"));
-		titlePanel.add(lbTitle);
 	}
 
 	/**
 	 * 初始化中间部分窗口
 	 */
 	private void initContentPanel() {
-		jpContentPanel = new JPanel();
-		frmTs.getContentPane().add(jpContentPanel, BorderLayout.CENTER);
-		jpContentPanel.setLayout(new BorderLayout(0, 0));
 	}
 
 	/**
@@ -139,10 +175,10 @@ public class MainWindow {
 		JScrollPane jScrollPane1 = new JScrollPane();
 		// 树根
 		treeRoot = new DefaultMutableTreeNode();
-		
+
 		jTree = new JTree(treeRoot);
-		treeModel = (DefaultTreeModel) jTree.getModel();  
-		
+		treeModel = (DefaultTreeModel) jTree.getModel();
+
 		addPsiTableNode(treeRoot);
 		addSiTableNode(treeRoot);
 
@@ -197,7 +233,7 @@ public class MainWindow {
 	private void addSiTableNode(DefaultMutableTreeNode treeRoot) {
 		DefaultMutableTreeNode siRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI"));
 		treeRoot.add(siRoot);
-		
+
 		// sdt表
 		DefaultMutableTreeNode sdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.SDT"));
 		siRoot.add(sdtRoot);
@@ -248,26 +284,28 @@ public class MainWindow {
 		addSitTableThread.start();
 
 		// eit表
-		DefaultMutableTreeNode eitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT"));
+		DefaultMutableTreeNode eitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"));
 		siRoot.add(eitRoot);
-		AddTableThread addEitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT"), eitRoot,
+		AddTableThread addEitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"), eitRoot,
 				filePath);
 		addEitTableThread.start();
 
 		// eit表(0x50)
-		DefaultMutableTreeNode eitOther50Root = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_50"));
+		DefaultMutableTreeNode eitOther50Root = new DefaultMutableTreeNode(
+				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_50"));
 		siRoot.add(eitOther50Root);
-		AddTableThread addEitOther50TableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_50"), eitOther50Root,
-				filePath);
+		AddTableThread addEitOther50TableThread = new AddTableThread(
+				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_50"), eitOther50Root, filePath);
 		addEitOther50TableThread.start();
-		
+
 		// eit表(0x51)
-		DefaultMutableTreeNode eitOther51Root = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_51"));
+		DefaultMutableTreeNode eitOther51Root = new DefaultMutableTreeNode(
+				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_51"));
 		siRoot.add(eitOther51Root);
-		AddTableThread addEitOther51TableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_OTHER_51"), eitOther51Root,
-				filePath);
+		AddTableThread addEitOther51TableThread = new AddTableThread(
+				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_51"), eitOther51Root, filePath);
 		addEitOther51TableThread.start();
-		
+
 		// bat表
 		DefaultMutableTreeNode batRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.BAT"));
 		siRoot.add(batRoot);
@@ -295,7 +333,7 @@ public class MainWindow {
 				} else if (TS_Utils.isTsFile(filePath)) {
 					frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title") + "   " + filePath);
 					cleanData();
-					addTree(jpContentPanel);
+					addTree(psisiTreePanel);
 				} else {
 					logger.info("不是TS文件");
 				}
@@ -323,16 +361,16 @@ public class MainWindow {
 	 * @author Administrator
 	 */
 	private void cleanData() {
-		jpContentPanel.removeAll();
-		jpContentPanel.repaint();
+		psisiTreePanel.removeAll();
+		psisiTreePanel.repaint();
 	}
-	
+
 	/**
 	 * 刷新PSI/SI界面数据
 	 * 
 	 * @author Administrator
 	 */
-	public static void reflashData() {
-		treeModel.reload();		
+	public static synchronized void reflashData() {
+		treeModel.reload();
 	}
 }

@@ -8,7 +8,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.alex.ts_parser.bean.descriptor.ContentInfo;
+import com.alex.ts_parser.bean.descriptor.ContentNibbleLevelMap;
 import com.alex.ts_parser.bean.descriptor.Descriptor;
+import com.alex.ts_parser.bean.si.EIT_Table;
 
 public class ReflectUtils {
 	private static Logger logger = LogManager.getLogger("");
@@ -41,7 +44,7 @@ public class ReflectUtils {
 						Class<?> cla = o.getClass();
 						if (cla.getName().equals("[B")) {
 							logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
-						}else if(cla.getName().equals("[J")){
+						} else if (cla.getName().equals("[J")) {
 							logger.info("变量： " + varName + " = " + Arrays.toString((long[]) o));
 						}
 					}
@@ -65,8 +68,16 @@ public class ReflectUtils {
 			for (int i = 0; i < arr.length; i++) {
 				Object objElem = arr[i];
 				if (objElem != null) {
-					DefaultMutableTreeNode objNode = new DefaultMutableTreeNode(
-							String.format("%s [%d]", getObjectClassFileName(objElem), i));
+					DefaultMutableTreeNode objNode;
+					if (getObjectClassFileName(objElem).equals("EIT_Table")) {
+						objNode = new DefaultMutableTreeNode(String.format(
+								"%s serviceId = %d, section Number = %d, versionNumber = %d",
+								getObjectClassFileName(objElem), ((EIT_Table) objElem).getServiceId(),
+								((EIT_Table) objElem).getSectionNumber(), ((EIT_Table) objElem).getVersionNumber()));
+					} else {
+						objNode = new DefaultMutableTreeNode(
+								String.format("%s [%d]", getObjectClassFileName(objElem), i));
+					}
 					getTreeByObjAttr(objElem, objNode);
 					parentNode.add(objNode);
 				}
@@ -88,25 +99,35 @@ public class ReflectUtils {
 					Object o = field.get(obj);
 					DefaultMutableTreeNode childs = null;
 					if (o == null) {
-						logger.info(String.format("%s is null", varName));
+						// TODO 去除注释
+//						logger.info(String.format("%s is null", varName));
 					} else if (o.getClass().isArray()) { // 判断是否是数组
 						if (!isJavaClass(o.getClass())) {
 							Object[] arr = (Object[]) o; // 装换成数组
 							if (arr.length == 0) {
 								continue;
-							} else if (field.getName().equals("descriptorArray")) {
-								varName = "描述子";
-							} else if (field.getName().equals("patProgramInfoArray")) {
-								varName = "PMT PID信息";
-							} else if (field.getName().equals("transportStreamDsecriptorArray")) {
-								varName = "TS流描述组";
 							}
+							switch (field.getName()) {
+							case "descriptorArray":
+								varName = "描述子";
+								break;
+							case "patProgramInfoArray":
+								varName = "PMT PID信息";
+								break;
+							case "transportStreamDsecriptorArray":
+								varName = "TS流描述组";
+								break;
+
+							default:
+								break;
+							}
+
 							DefaultMutableTreeNode arrayChilds = new DefaultMutableTreeNode(varName);
 							parentNode.add(arrayChilds);
 							for (int index = 0; index < arr.length; index++) {
 								Object a = arr[index];
 								if (a == null) {
-									logger.info("出现空描述子对象");
+//									logger.info("出现空数组元素");
 									continue;
 								} else {
 									if (a instanceof Descriptor) {
@@ -123,7 +144,16 @@ public class ReflectUtils {
 										arrayChilds.add(getTreeByObjAttr(a, childs));
 									} else {
 										varName = getObjectClassFileName(a);
-										childs = new DefaultMutableTreeNode(String.format("%s [%d]", varName, index));
+										if (varName.equals("com.alex.ts_parser.bean.si.EIT_Table")) {
+											childs = new DefaultMutableTreeNode(String.format(
+													"%s serviceId = %d, section Number = %d, versionNumber = %d [%d]",
+													varName, ((EIT_Table) a).getServiceId(),
+													((EIT_Table) a).getSectionNumber(),
+													((EIT_Table) a).getVersionNumber(), index));
+										} else {
+											childs = new DefaultMutableTreeNode(
+													String.format("%s [%d]", varName, index));
+										}
 										arrayChilds.add(getTreeByObjAttr(a, childs));
 									}
 								}
@@ -131,11 +161,13 @@ public class ReflectUtils {
 						} else {
 							Class<?> cla = o.getClass();
 							if (cla.getName().equals("[B")) {
-								logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
-								childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((byte[]) o));
+								// logger.info("变量： " + varName + " = " + Arrays.toString((byte[]) o));
+								// TODO 有些变量可能处理方式不同
+								childs = new DefaultMutableTreeNode(varName + " = " + new String((byte[]) o) + " (原始数据："
+										+ Arrays.toString((byte[]) o) + ")");
 								parentNode.add(childs);
-							}else if(cla.getName().equals("[J")){
-								logger.info("变量： " + varName + " = " + Arrays.toString((long[]) o));
+							} else if (cla.getName().equals("[J")) {
+								// logger.info("变量： " + varName + " = " + Arrays.toString((long[]) o));
 								childs = new DefaultMutableTreeNode(varName + " = " + Arrays.toString((long[]) o));
 								parentNode.add(childs);
 							}
@@ -145,7 +177,24 @@ public class ReflectUtils {
 						getTreeByObjAttr(o, childs);
 						parentNode.add(childs);
 					} else {
-						childs = new DefaultMutableTreeNode(varName + " = " + o);
+						String nodeName = "";
+						switch (varName) {
+						case "contentNibbleLevel1":
+							nodeName = String.format("%s = %d(%s)", varName, o,
+									ContentNibbleLevelMap.contentNibbleLevel1Map.get(o));
+							break;
+						case "contentNibbleLevel2":
+							nodeName = String.format("%s = %d(%s)", varName, o,
+									ContentNibbleLevelMap.contentNibbleLevel2Map.get(
+											new Integer(((ContentInfo) obj).getContentNibbleLevel1()) * 16 + (int) o));
+							break;
+
+						default:
+							nodeName = String.format("%s = %d", varName, o);
+							break;
+						}
+
+						childs = new DefaultMutableTreeNode(nodeName);
 						parentNode.add(childs);
 					}
 					if (!access)

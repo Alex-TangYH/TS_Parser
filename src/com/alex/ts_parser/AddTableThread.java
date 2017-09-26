@@ -1,7 +1,9 @@
 package com.alex.ts_parser;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,9 +32,9 @@ public class AddTableThread extends Thread {
 	private final static String TDT = "TDT";
 	private final static String ST = "ST";
 	private final static String SIT = "SIT";
-	private final static String EIT = "EIT";
-	private final static String EIT_OTHER_50 = "EIT_OTHER (0x50)";
-	private final static String EIT_OTHER_51 = "EIT_OTHER (0x51)";
+	private final static String EIT_PF_Actual = "EIT_PF_Actual";
+	private final static String EIT_SCHEDULE_ACTUAL_50 = "EIT_Schedule_Actual (0x50)";
+	private final static String EIT_SCHEDULE_ACTUAL_51 = "EIT_Schedule_Actual (0x51)";
 	private final static String BAT = "BAT";
 	private final static String DIT = "DIT";
 	private final static String SDT = "SDT";
@@ -75,6 +77,46 @@ public class AddTableThread extends Thread {
 
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
+	}
+
+	// EIT≈≈–Ú∑Ω∑®
+	public EIT_Table[] sortEit(EIT_Table[] eitArray) {
+		if (eitArray != null) {
+			Arrays.sort(eitArray, new Comparator<EIT_Table>() {
+				@Override
+				public int compare(EIT_Table eitArray1, EIT_Table eitArray2) {
+					int serviceId1 = eitArray1.getServiceId();
+					int serviceId2 = eitArray2.getServiceId();
+					int sectionNumber1 = eitArray1.getSectionNumber();
+					int sectionNumber2 = eitArray2.getSectionNumber();
+					int versionNumber1 = eitArray1.getVersionNumber();
+					int versionNumber2 = eitArray2.getVersionNumber();
+
+					if (serviceId1 > serviceId2) {
+						return 1;
+					} else if (serviceId1 < serviceId2) {
+						return -1;
+					} else {
+						if (versionNumber1 == versionNumber2) {
+							if (sectionNumber1 > sectionNumber2) {
+								return 1;
+							} else if (sectionNumber1 < sectionNumber2) {
+								return -1;
+							} else {
+								return 0;
+							}
+						} else if (versionNumber1 < versionNumber2) {
+							return -1;
+						} else {
+							return 1;
+						}
+					}
+				}
+			});
+		} else {
+			return null;
+		}
+		return eitArray;
 	}
 
 	@Override
@@ -155,9 +197,10 @@ public class AddTableThread extends Thread {
 			}
 			MainWindow.reflashData();
 			break;
-		case EIT:
+		case EIT_PF_Actual:
 			EIT_Table[] eitArray = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_PF_ACTUAL);
 			if (eitArray != null) {
+				eitArray = sortEit(eitArray);
 				ReflectUtils.getTreeByObjAttr(eitArray, dataNode);
 			} else {
 				dataNode.removeFromParent();
@@ -165,23 +208,25 @@ public class AddTableThread extends Thread {
 			}
 			MainWindow.reflashData();
 			break;
-		case EIT_OTHER_50:
+		case EIT_SCHEDULE_ACTUAL_50:
 			EIT_Table[] eit50Array = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_OTHER_50);
 			if (eit50Array != null) {
+				eit50Array = sortEit(eit50Array);
 				ReflectUtils.getTreeByObjAttr(eit50Array, dataNode);
 			} else {
 				dataNode.removeFromParent();
-				logger.info("eit other_seven is null");
+				logger.info("EIT_SCHEDULE_ACTUAL_50 is null");
 			}
 			MainWindow.reflashData();
 			break;
-		case EIT_OTHER_51:
+		case EIT_SCHEDULE_ACTUAL_51:
 			EIT_Table[] eit51Array = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_OTHER_51);
 			if (eit51Array != null) {
+				eit51Array = sortEit(eit51Array);
 				ReflectUtils.getTreeByObjAttr(eit51Array, dataNode);
 			} else {
 				dataNode.removeFromParent();
-				logger.info("eit other_seven is null");
+				logger.info("EIT_SCHEDULE_ACTUAL_51 is null");
 			}
 			MainWindow.reflashData();
 			break;
@@ -243,7 +288,6 @@ public class AddTableThread extends Thread {
 			MainWindow.reflashData();
 			break;
 		default:
-			MainWindow.reflashData();
 			break;
 		}
 	}

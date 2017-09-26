@@ -23,7 +23,10 @@ public class DescriptorMap {
 		descriptorNameMap.put(74, "LinkageDescriptor");
 		descriptorNameMap.put(77, "ShortEventDescriptor");
 		descriptorNameMap.put(78, "ExtendedEventDescriptor");
+		descriptorNameMap.put(80, "ComponentDescriptor");
 		descriptorNameMap.put(82, "StreamIndentifierDescriptor");
+		descriptorNameMap.put(84, "ContentDescriptor");
+		descriptorNameMap.put(85, "ParentalRatingDescriptor");
 		descriptorNameMap.put(86, "TeletextDescriptor");
 		descriptorNameMap.put(88, "LocalTimeOffsetDescriptor");
 		descriptorNameMap.put(90, "TerrestrialDeliverySystemDescriptor");
