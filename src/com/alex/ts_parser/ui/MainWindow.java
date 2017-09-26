@@ -4,47 +4,56 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.List;
 
-import javax.swing.JButton;
+import javax.swing.AbstractListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alex.ts_parser.AddTableThread;
+import com.alex.ts_parser.bean.EpgTableModel;
 import com.alex.ts_parser.utils.StringResocesHelper;
 import com.alex.ts_parser.utils.TS_Utils;
+import com.alex.ts_parser.vo.EpgTableInfoList;
+import com.alex.ts_parser.vo.ProgramInfoList;
+import com.alex.ts_parser.vo.ProgramTypeInfoList;
+import com.alex.ts_parser.vo.TableData;
 
 public class MainWindow {
 
 	public JFrame frmTs;
-	private static JPanel psisiTreePanel;
 	private JMenuBar jmbMainMenuBar;
-	private JPanel jpBottomPanel;
 	private Logger logger = LogManager.getLogger("MainWindow");
 	private String filePath = null;
 	private String fileName = null;
-	public static DefaultMutableTreeNode treeRoot;
-	private static DefaultTreeModel treeModel;
 	private JTree jTree;
 	private JTable programInfoTable;
+	public static DefaultMutableTreeNode treeRoot;
+	public static MyTreeModel treeModel;
+	private static JList<Object> programList;
+	private static JList<Object> programTypeList;
+	private JScrollPane psisiScrollPane;
+	private JPanel psisiTreePanel;
 
 	/**
 	 * Create the application.
 	 */
 	public MainWindow() {
-
 		initialize();
 	}
 
@@ -52,7 +61,6 @@ public class MainWindow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-
 		initMainFrame();
 
 		initMenu();
@@ -61,8 +69,7 @@ public class MainWindow {
 
 		initContentPanel();
 
-		initBottomPanel();
-
+		initTabPanel();
 	}
 
 	/**
@@ -76,56 +83,67 @@ public class MainWindow {
 	}
 
 	/**
-	 * 初始化底部窗口
+	 * 初始化选项卡窗口
 	 */
-	private void initBottomPanel() {
-
-		JPanel psi_si = new JPanel();
-		psi_si.setBorder(null);
-		psi_si.setPreferredSize(new Dimension(300, 150));
-		frmTs.getContentPane().add(psi_si, BorderLayout.WEST);
-		psi_si.setLayout(new BorderLayout(0, 0));
-		JPanel psisiTitlePanel = new JPanel();
-		psi_si.add(psisiTitlePanel, BorderLayout.NORTH);
-		JLabel lbPsisiTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"));
-		psisiTitlePanel.add(lbPsisiTitle);
-		psisiTreePanel = new JPanel();
-		psi_si.add(psisiTreePanel);
-		psisiTreePanel.setLayout(new BorderLayout(0, 0));
-
+	private void initTabPanel() {
 		JPanel epgPanel = new JPanel();
 		epgPanel.setBorder(null);
 		frmTs.getContentPane().add(epgPanel, BorderLayout.CENTER);
 		epgPanel.setLayout(new BorderLayout(0, 0));
-		
+
 		JPanel epgTitlePanel = new JPanel();
 		JLabel lbEpgTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.EPGTitle"));
 		epgTitlePanel.add(lbEpgTitle);
 		epgPanel.add(epgTitlePanel, BorderLayout.NORTH);
-		
+
 		JPanel epgInfoPanel = new JPanel();
 		epgPanel.add(epgInfoPanel);
 		epgInfoPanel.setLayout(new BorderLayout(0, 0));
 
-		
-		String[] columnas = {"Name", "Nickname","Age"};
-		Object[][] datos= {
-				 {"Daniel G. Machado","Dan","33"},
-				 {"jorge2","giraldo2","21"},
-				 {"jorge3","giraldo3","22"},
-				 {"Bárbara Gomes Machado","Bah","23"}
-		 };
-		programInfoTable = new JTable(datos,columnas);
+		// TODO 初始化数据
+		EpgTableModel epgTableModel = new EpgTableModel(EpgTableInfoList.getInstance().getEpgTableInfolist());
+		programInfoTable = new JTable();
+		programInfoTable.setModel(epgTableModel);
 		JScrollPane scrollPane = new JScrollPane(programInfoTable);
 		epgInfoPanel.add(scrollPane, BorderLayout.CENTER);
-		jpBottomPanel = new JPanel();
-		frmTs.getContentPane().add(jpBottomPanel, BorderLayout.SOUTH);
 
-		JButton btnNewButton = new JButton(StringResocesHelper.getStringByKey("MainWindow.Button.PSI_SI"));
-		jpBottomPanel.add(btnNewButton);
+		JPanel tabPanel = new JPanel();
+		frmTs.getContentPane().add(tabPanel, BorderLayout.WEST);
+		tabPanel.setLayout(new BorderLayout(0, 0));
 
-		JButton btnNewButton_1 = new JButton(StringResocesHelper.getStringByKey("MainWindow.Button.EPG"));
-		jpBottomPanel.add(btnNewButton_1);
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabPanel.add(tabbedPane);
+
+		psisiTreePanel = new JPanel();
+		tabbedPane.addTab(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"), null, psisiTreePanel,
+				null);
+		psisiTreePanel.setBorder(null);
+		psisiTreePanel.setPreferredSize(new Dimension(290, 150));
+		psisiTreePanel.setLayout(new BorderLayout(0, 0));
+
+		treeRoot = new DefaultMutableTreeNode("PSI/SI");
+		treeModel = new MyTreeModel(treeRoot);
+		jTree = new JTree(treeModel);
+
+		psisiScrollPane = new JScrollPane();
+		psisiScrollPane.setViewportView(jTree);
+		psisiTreePanel.add(psisiScrollPane, BorderLayout.CENTER);
+
+		JPanel programListPanel = new JPanel();
+		tabbedPane.addTab("节目列表", null, programListPanel, null);
+		programListPanel.setLayout(new BorderLayout(0, 0));
+
+		programList = new JList<Object>();
+		JScrollPane programInfoScrollPane = new JScrollPane(programList);
+		programListPanel.add(programInfoScrollPane, BorderLayout.CENTER);
+
+		JPanel programTypeListPanel = new JPanel();
+		tabbedPane.addTab("节目类别", null, programTypeListPanel, null);
+		programTypeListPanel.setLayout(new BorderLayout(0, 0));
+
+		programTypeList = new JList<Object>();
+		JScrollPane programTypeScrollPane = new JScrollPane(programTypeList);
+		programTypeListPanel.add(programTypeScrollPane, BorderLayout.CENTER);
 	}
 
 	/**
@@ -162,8 +180,6 @@ public class MainWindow {
 		JMenuItem mniHelp = new JMenuItem(StringResocesHelper.getStringByKey("MainWindow.MenuBar.MenuItem.Help"));
 		jmbMainMenuBar.add(mniHelp);
 		// TODO 增加助记符
-		// mniOpen.setAccelerator(KeyStroke.getKeyStroke('O'));
-		// mniOpen.setMnemonic('O');
 	}
 
 	/**
@@ -171,20 +187,10 @@ public class MainWindow {
 	 * 
 	 * @param jPanel
 	 */
-	private void addTree(JPanel jPanel) {
-		JScrollPane jScrollPane1 = new JScrollPane();
+	private void addTree() {
 		// 树根
-		treeRoot = new DefaultMutableTreeNode();
-
-		jTree = new JTree(treeRoot);
-		treeModel = (DefaultTreeModel) jTree.getModel();
-
 		addPsiTableNode(treeRoot);
 		addSiTableNode(treeRoot);
-
-		// 加入容器
-		jScrollPane1.setViewportView(jTree);
-		jPanel.add(jScrollPane1);
 	}
 
 	/**
@@ -284,10 +290,11 @@ public class MainWindow {
 		addSitTableThread.start();
 
 		// eit表
-		DefaultMutableTreeNode eitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"));
+		DefaultMutableTreeNode eitRoot = new DefaultMutableTreeNode(
+				StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"));
 		siRoot.add(eitRoot);
-		AddTableThread addEitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"), eitRoot,
-				filePath);
+		AddTableThread addEitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"),
+				eitRoot, filePath);
 		addEitTableThread.start();
 
 		// eit表(0x50)
@@ -333,7 +340,7 @@ public class MainWindow {
 				} else if (TS_Utils.isTsFile(filePath)) {
 					frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title") + "   " + filePath);
 					cleanData();
-					addTree(psisiTreePanel);
+					addTree();
 				} else {
 					logger.info("不是TS文件");
 				}
@@ -361,8 +368,11 @@ public class MainWindow {
 	 * @author Administrator
 	 */
 	private void cleanData() {
-		psisiTreePanel.removeAll();
-		psisiTreePanel.repaint();
+		programTypeList.removeAll();
+		programTypeList.repaint();
+		new LinkedList<String>();
+		ProgramTypeInfoList.getInstance().setProgramTypeList(new LinkedList<String>());
+		TableData.getInstance().setFinishedThreadCount(0);
 	}
 
 	/**
@@ -372,5 +382,41 @@ public class MainWindow {
 	 */
 	public static synchronized void reflashData() {
 		treeModel.reload();
+		reflashProgramTypeList();
+		reflashProgramList();
+	}
+
+	public static synchronized void reflashProgramTypeList() {
+		programTypeList.setModel(new AbstractListModel<Object>() {
+			private static final long serialVersionUID = -2625699078063016248L;
+			List<String> values = ProgramTypeInfoList.getInstance().getProgramTypeList();
+
+			public int getSize() {
+				return values.size();
+			}
+
+			public Object getElementAt(int index) {
+				return values.get(index);
+			}
+		});
+		programTypeList.validate();
+		programTypeList.repaint();
+	}
+
+	public static synchronized void reflashProgramList() {
+		programList.setModel(new AbstractListModel<Object>() {
+			private static final long serialVersionUID = -1517802494832517338L;
+			List<Integer> values = ProgramInfoList.getInstance().getProgramIdList();
+
+			public int getSize() {
+				return values.size();
+			}
+
+			public Object getElementAt(int index) {
+				return values.get(index);
+			}
+		});
+		programList.validate();
+		programList.repaint();
 	}
 }

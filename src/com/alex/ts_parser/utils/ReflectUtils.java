@@ -12,6 +12,7 @@ import com.alex.ts_parser.bean.descriptor.ContentInfo;
 import com.alex.ts_parser.bean.descriptor.ContentNibbleLevelMap;
 import com.alex.ts_parser.bean.descriptor.Descriptor;
 import com.alex.ts_parser.bean.si.EIT_Table;
+import com.alex.ts_parser.vo.ProgramTypeInfoList;
 
 public class ReflectUtils {
 	private static Logger logger = LogManager.getLogger("");
@@ -71,8 +72,8 @@ public class ReflectUtils {
 					DefaultMutableTreeNode objNode;
 					if (getObjectClassFileName(objElem).equals("EIT_Table")) {
 						objNode = new DefaultMutableTreeNode(String.format(
-								"%s serviceId = %d, section Number = %d, versionNumber = %d",
-								getObjectClassFileName(objElem), ((EIT_Table) objElem).getServiceId(),
+								"%s [%d] serviceId = %d, section Number = %d, versionNumber = %d",
+								getObjectClassFileName(objElem), i, ((EIT_Table) objElem).getServiceId(),
 								((EIT_Table) objElem).getSectionNumber(), ((EIT_Table) objElem).getVersionNumber()));
 					} else {
 						objNode = new DefaultMutableTreeNode(
@@ -100,7 +101,7 @@ public class ReflectUtils {
 					DefaultMutableTreeNode childs = null;
 					if (o == null) {
 						// TODO 去除注释
-//						logger.info(String.format("%s is null", varName));
+						// logger.info(String.format("%s is null", varName));
 					} else if (o.getClass().isArray()) { // 判断是否是数组
 						if (!isJavaClass(o.getClass())) {
 							Object[] arr = (Object[]) o; // 装换成数组
@@ -127,7 +128,7 @@ public class ReflectUtils {
 							for (int index = 0; index < arr.length; index++) {
 								Object a = arr[index];
 								if (a == null) {
-//									logger.info("出现空数组元素");
+									// logger.info("出现空数组元素");
 									continue;
 								} else {
 									if (a instanceof Descriptor) {
@@ -144,16 +145,7 @@ public class ReflectUtils {
 										arrayChilds.add(getTreeByObjAttr(a, childs));
 									} else {
 										varName = getObjectClassFileName(a);
-										if (varName.equals("com.alex.ts_parser.bean.si.EIT_Table")) {
-											childs = new DefaultMutableTreeNode(String.format(
-													"%s serviceId = %d, section Number = %d, versionNumber = %d [%d]",
-													varName, ((EIT_Table) a).getServiceId(),
-													((EIT_Table) a).getSectionNumber(),
-													((EIT_Table) a).getVersionNumber(), index));
-										} else {
-											childs = new DefaultMutableTreeNode(
-													String.format("%s [%d]", varName, index));
-										}
+										childs = new DefaultMutableTreeNode(String.format("%s [%d]", varName, index));
 										arrayChilds.add(getTreeByObjAttr(a, childs));
 									}
 								}
@@ -180,8 +172,37 @@ public class ReflectUtils {
 						String nodeName = "";
 						switch (varName) {
 						case "contentNibbleLevel1":
-							nodeName = String.format("%s = %d(%s)", varName, o,
-									ContentNibbleLevelMap.contentNibbleLevel1Map.get(o));
+							String level1Name = ContentNibbleLevelMap.contentNibbleLevel1Map.get(o);
+							if (level1Name != null) {
+								nodeName = String.format("%s = %d(%s)", varName, o, level1Name);
+								boolean isTypeExist = false;
+								// 将类型数据存入类型数组中
+								for (int i = 0; i < ProgramTypeInfoList.getInstance().getProgramTypeList()
+										.size(); i++) {
+									if (level1Name
+											.equals(ProgramTypeInfoList.getInstance().getProgramTypeList().get(i))) {
+										isTypeExist = true;
+										break;
+									}
+								}
+
+								int iLoopIndex = 0;
+								for (String type : ProgramTypeInfoList.getInstance().getProgramTypeList()) {
+									if (level1Name.equals(type)) {
+										isTypeExist = true;
+										break;
+									}
+									iLoopIndex++;
+								}
+								if (!isTypeExist) {
+									ProgramTypeInfoList.getInstance().getProgramTypeList().add(iLoopIndex, level1Name);
+								}
+
+							} else {
+								// TODO 输出保留类型
+								nodeName = String.format("%s = %d", varName, o);
+							}
+
 							break;
 						case "contentNibbleLevel2":
 							nodeName = String.format("%s = %d(%s)", varName, o,
@@ -205,6 +226,7 @@ public class ReflectUtils {
 			}
 		}
 		return parentNode;
+
 	}
 
 	/**

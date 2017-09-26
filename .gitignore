@@ -1,3 +1,4 @@
 
 *.class
 bin/log4j2.xml
+src/com/alex/ts_parser/ui/TempUIClass.java
