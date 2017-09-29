@@ -16,28 +16,5 @@ public class ParentalRatingDescriptor extends Descriptor {
 	public void setParentalRatingInfoArray(ParentalRatingInfo[] parentalRatingInfoArray) {
 		this.parentalRatingInfoArray = parentalRatingInfoArray;
 	}
-	
-	
 }
 
-class ParentalRatingInfo {
-	private int countryCode;
-	private int rating;
-	public ParentalRatingInfo(int countryCode, int rating) {
-		super();
-		this.countryCode = countryCode;
-		this.rating = rating;
-	}
-	public int getCountryCode() {
-		return countryCode;
-	}
-	public void setCountryCode(int countryCode) {
-		this.countryCode = countryCode;
-	}
-	public int getRating() {
-		return rating;
-	}
-	public void setRating(int rating) {
-		this.rating = rating;
-	}
-}

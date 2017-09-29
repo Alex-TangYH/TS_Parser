@@ -29,6 +29,7 @@ import com.alex.ts_parser.vo.TableData;
 
 public class AddTableThread extends Thread {
 	private Logger logger = LogManager.getLogger("AddTableThread");
+	// TODO 改成枚举
 	private final static String RST = "RST";
 	private final static String TOT = "TOT";
 	private final static String TDT = "TDT";
@@ -122,9 +123,10 @@ public class AddTableThread extends Thread {
 	}
 
 	private int addProgramListInfo(EIT_Table[] eitArrays) {
-		for (int index = 0; index < eitArrays.length; index++) {
-			EIT_Table eitTable = eitArrays[index];
-			ProgramInfoList.getInstance().getProgramIdList().add(eitTable.getServiceId());
+		for (EIT_Table eitTable : eitArrays) {
+			if (!ProgramInfoList.getInstance().getProgramIdList().contains(eitTable.getServiceId())) {
+				ProgramInfoList.getInstance().getProgramIdList().add(eitTable.getServiceId());
+			}
 		}
 		return 1;
 	}
@@ -136,191 +138,181 @@ public class AddTableThread extends Thread {
 
 	@Override
 	public void run() {
-		switch (tableName) {
-		case RST:
-			RST_Table rstTable = NativeFunctionManager.parseRST(filePath);
-			TableData.getInstance().setRstTable(rstTable);
-
-			if (rstTable != null) {
-				ReflectUtils.getTreeByObjAttr(rstTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("rst is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case DIT:
-			DIT_Table ditTable = NativeFunctionManager.parseDIT(filePath);
-			TableData.getInstance().setDitTable(ditTable);
-			if (ditTable != null) {
-				ReflectUtils.getTreeByObjAttr(ditTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("dit is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case ST:
-			ST_Table stTable = NativeFunctionManager.parseST(filePath);
-			TableData.getInstance().setStTable(stTable);
-			if (stTable != null) {
-				ReflectUtils.getTreeByObjAttr(stTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("st is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case TOT:
-			TOT_Table totTable = NativeFunctionManager.parseTOT(filePath);
-			TableData.getInstance().setTotTable(totTable);
-			if (totTable != null) {
-				ReflectUtils.getTreeByObjAttr(totTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("tot is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case TDT:
-			TDT_Table tdtTable = NativeFunctionManager.parseTDT(filePath);
-			TableData.getInstance().setTdtTable(tdtTable);
-			if (tdtTable != null) {
-				ReflectUtils.getTreeByObjAttr(tdtTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("tdt is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case SDT:
-			SDT_Table sdtTable = NativeFunctionManager.parseSDT(filePath);
-			TableData.getInstance().setSdtTable(sdtTable);
-			if (sdtTable != null) {
-				ReflectUtils.getTreeByObjAttr(sdtTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("sdt is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case SIT:
-			SIT_Table sitTable = NativeFunctionManager.parseSIT(filePath);
-			TableData.getInstance().setSitTable(sitTable);
-			if (sitTable != null) {
-				ReflectUtils.getTreeByObjAttr(sitTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("sit is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case EIT_PF_Actual:
-			EIT_Table[] eitPfArrays = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_PF_ACTUAL);
-			TableData.getInstance().setEitPfArrays(eitPfArrays);
-			if (eitPfArrays != null) {
-				addProgramListInfo(eitPfArrays);
-				eitPfArrays = sortEit(eitPfArrays);
-				ReflectUtils.getTreeByObjAttr(eitPfArrays, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("eit pf_actual is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case EIT_SCHEDULE_ACTUAL_50:
-			EIT_Table[] eitSchedule50Arrays = NativeFunctionManager.parseEIT(filePath,
-					NativeFunctionManager.EIT_OTHER_50);
-			TableData.getInstance().setEitSchedule50Arrays(eitSchedule50Arrays);
-			if (eitSchedule50Arrays != null) {
-				addProgramListInfo(eitSchedule50Arrays);
-				eitSchedule50Arrays = sortEit(eitSchedule50Arrays);
-				ReflectUtils.getTreeByObjAttr(eitSchedule50Arrays, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("EIT_SCHEDULE_ACTUAL_50 is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case EIT_SCHEDULE_ACTUAL_51:
-			EIT_Table[] eitSchedule51Arrays = NativeFunctionManager.parseEIT(filePath,
-					NativeFunctionManager.EIT_OTHER_51);
-			TableData.getInstance().setEitSchedule51Arrays(eitSchedule51Arrays);
-			if (eitSchedule51Arrays != null) {
-				addProgramListInfo(eitSchedule51Arrays);
-				eitSchedule51Arrays = sortEit(eitSchedule51Arrays);
-				ReflectUtils.getTreeByObjAttr(eitSchedule51Arrays, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("EIT_SCHEDULE_ACTUAL_51 is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case BAT:
-			BAT_Table batTable = NativeFunctionManager.parseBAT(filePath);
-			TableData.getInstance().setBatTable(batTable);
-			if (batTable != null) {
-				ReflectUtils.getTreeByObjAttr(batTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("bat is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case CAT:
-			CAT_Table catTable = NativeFunctionManager.parseCAT(filePath);
-			TableData.getInstance().setCatTable(catTable);
-			if (catTable != null) {
-				ReflectUtils.getTreeByObjAttr(catTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("cat is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case PAT:
-			PAT_Table patTable = NativeFunctionManager.parsePAT(filePath);
-			TableData.getInstance().setPatTable(patTable);
-			if (patTable != null) {
-				ReflectUtils.getTreeByObjAttr(patTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("pat is null");
-			}
-			MainWindow.reflashData();
-			break;
-		case PMT:
-			PAT_Table patTemp = NativeFunctionManager.parsePAT(filePath);
-			if (patTemp != null && patTemp.getPatProgramInfo().length > 0) {
-				PMT_Table[] pmtTableArray = NativeFunctionManager.parsePMT(filePath, patTemp.getPatProgramInfo().length,
-						patTemp.getPatProgramInfo());
-				TableData.getInstance().setPmtTableArray(pmtTableArray);
-				if (pmtTableArray != null) {
-					ReflectUtils.getTreeByObjAttr(pmtTableArray, dataNode);
+		try {
+			switch (tableName) {
+			case RST:
+				RST_Table rstTable = NativeFunctionManager.parseRST(filePath);
+				TableData.getInstance().setRstTable(rstTable);
+				if (rstTable != null) {
+					ReflectUtils.getTreeByObjAttr(rstTable, dataNode);
 				} else {
 					MainWindow.treeModel.removeNodeFromParent(dataNode);
-					logger.info("pmt is null");
+					logger.info("rst is null");
 				}
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("pmt is null, because patProgramInfo length <= 0");
+				break;
+			case DIT:
+				DIT_Table ditTable = NativeFunctionManager.parseDIT(filePath);
+				TableData.getInstance().setDitTable(ditTable);
+				if (ditTable != null) {
+					ReflectUtils.getTreeByObjAttr(ditTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("dit is null");
+				}
+				break;
+			case ST:
+				ST_Table stTable = NativeFunctionManager.parseST(filePath);
+				TableData.getInstance().setStTable(stTable);
+				if (stTable != null) {
+					ReflectUtils.getTreeByObjAttr(stTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("st is null");
+				}
+				break;
+			case TOT:
+				TOT_Table totTable = NativeFunctionManager.parseTOT(filePath);
+				TableData.getInstance().setTotTable(totTable);
+				if (totTable != null) {
+					ReflectUtils.getTreeByObjAttr(totTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("tot is null");
+				}
+				break;
+			case TDT:
+				TDT_Table tdtTable = NativeFunctionManager.parseTDT(filePath);
+				TableData.getInstance().setTdtTable(tdtTable);
+				if (tdtTable != null) {
+					ReflectUtils.getTreeByObjAttr(tdtTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("tdt is null");
+				}
+				break;
+			case SDT:
+				SDT_Table sdtTable = NativeFunctionManager.parseSDT(filePath);
+				TableData.getInstance().setSdtTable(sdtTable);
+				if (sdtTable != null) {
+					ReflectUtils.getTreeByObjAttr(sdtTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("sdt is null");
+				}
+				break;
+			case SIT:
+				SIT_Table sitTable = NativeFunctionManager.parseSIT(filePath);
+				TableData.getInstance().setSitTable(sitTable);
+				if (sitTable != null) {
+					ReflectUtils.getTreeByObjAttr(sitTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("sit is null");
+				}
+				break;
+			case EIT_PF_Actual:
+				EIT_Table[] eitPfArrays = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_PF_ACTUAL);
+				TableData.getInstance().setEitPfArrays(eitPfArrays);
+				if (eitPfArrays != null) {
+					addProgramListInfo(eitPfArrays);
+					eitPfArrays = sortEit(eitPfArrays);
+					ReflectUtils.getTreeByObjAttr(eitPfArrays, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("eit pf_actual is null");
+				}
+				break;
+			case EIT_SCHEDULE_ACTUAL_50:
+				EIT_Table[] eitSchedule50Arrays = NativeFunctionManager.parseEIT(filePath,
+						NativeFunctionManager.EIT_OTHER_50);
+				TableData.getInstance().setEitSchedule50Arrays(eitSchedule50Arrays);
+				if (eitSchedule50Arrays != null) {
+					addProgramListInfo(eitSchedule50Arrays);
+					eitSchedule50Arrays = sortEit(eitSchedule50Arrays);
+					ReflectUtils.getTreeByObjAttr(eitSchedule50Arrays, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("EIT_SCHEDULE_ACTUAL_50 is null");
+				}
+				break;
+			case EIT_SCHEDULE_ACTUAL_51:
+				EIT_Table[] eitSchedule51Arrays = NativeFunctionManager.parseEIT(filePath,
+						NativeFunctionManager.EIT_OTHER_51);
+				TableData.getInstance().setEitSchedule51Arrays(eitSchedule51Arrays);
+				if (eitSchedule51Arrays != null) {
+					addProgramListInfo(eitSchedule51Arrays);
+					eitSchedule51Arrays = sortEit(eitSchedule51Arrays);
+					ReflectUtils.getTreeByObjAttr(eitSchedule51Arrays, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("EIT_SCHEDULE_ACTUAL_51 is null");
+				}
+				break;
+			case BAT:
+				BAT_Table batTable = NativeFunctionManager.parseBAT(filePath);
+				TableData.getInstance().setBatTable(batTable);
+				if (batTable != null) {
+					ReflectUtils.getTreeByObjAttr(batTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("bat is null");
+				}
+				break;
+			case CAT:
+				CAT_Table catTable = NativeFunctionManager.parseCAT(filePath);
+				TableData.getInstance().setCatTable(catTable);
+				if (catTable != null) {
+					ReflectUtils.getTreeByObjAttr(catTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("cat is null");
+				}
+				break;
+			case PAT:
+				PAT_Table patTable = NativeFunctionManager.parsePAT(filePath);
+				TableData.getInstance().setPatTable(patTable);
+				if (patTable != null) {
+					ReflectUtils.getTreeByObjAttr(patTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("pat is null");
+				}
+				break;
+			case PMT:
+				PAT_Table patTemp = NativeFunctionManager.parsePAT(filePath);
+				if (patTemp != null && patTemp.getPatProgramInfo().length > 0) {
+					PMT_Table[] pmtTableArray = NativeFunctionManager.parsePMT(filePath,
+							patTemp.getPatProgramInfo().length, patTemp.getPatProgramInfo());
+					TableData.getInstance().setPmtTableArray(pmtTableArray);
+					if (pmtTableArray != null) {
+						ReflectUtils.getTreeByObjAttr(pmtTableArray, dataNode);
+					} else {
+						MainWindow.treeModel.removeNodeFromParent(dataNode);
+						logger.info("pmt is null");
+					}
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("pmt is null, because patProgramInfo length <= 0");
+				}
+				break;
+			case NIT:
+				NIT_Table nitTable = NativeFunctionManager.parseNIT(filePath);
+				TableData.getInstance().setNitTable(nitTable);
+				if (nitTable != null) {
+					ReflectUtils.getTreeByObjAttr(nitTable, dataNode);
+				} else {
+					MainWindow.treeModel.removeNodeFromParent(dataNode);
+					logger.info("nit is null");
+				}
+				break;
+			default:
+				break;
 			}
+		} catch (Exception e) {
+			logger.info("出错了" + e);
+		} finally {
 			MainWindow.reflashData();
-			break;
-		case NIT:
-			NIT_Table nitTable = NativeFunctionManager.parseNIT(filePath);
-			TableData.getInstance().setNitTable(nitTable);
-			if (nitTable != null) {
-				ReflectUtils.getTreeByObjAttr(nitTable, dataNode);
-			} else {
-				MainWindow.treeModel.removeNodeFromParent(dataNode);
-				logger.info("nit is null");
-			}
-			MainWindow.reflashData();
-			break;
-		default:
-			break;
+			TableData.getInstance().setFinishedThreadCount(TableData.getInstance().getFinishedThreadCount() + 1);
 		}
-		TableData.getInstance().setFinishedThreadCount(TableData.getInstance().getFinishedThreadCount() + 1);
 	}
 }

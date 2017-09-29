@@ -2,9 +2,12 @@ package com.alex.ts_parser.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
@@ -20,12 +23,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alex.ts_parser.AddTableThread;
+import com.alex.ts_parser.FillEpgDataThread;
+import com.alex.ts_parser.bean.EpgTableInfoBean;
 import com.alex.ts_parser.bean.EpgTableModel;
 import com.alex.ts_parser.utils.StringResocesHelper;
 import com.alex.ts_parser.utils.TS_Utils;
@@ -42,13 +55,18 @@ public class MainWindow {
 	private String filePath = null;
 	private String fileName = null;
 	private JTree jTree;
-	private JTable programInfoTable;
+	public static JTable programInfoTable;
 	public static DefaultMutableTreeNode treeRoot;
 	public static MyTreeModel treeModel;
 	private static JList<Object> programList;
 	private static JList<Object> programTypeList;
 	private JScrollPane psisiScrollPane;
 	private JPanel psisiTreePanel;
+	private static EpgTableModel epgTableModel;
+	public static List<EpgTableInfoBean> epgTableInfoListVo;
+	private JPanel epgInfoPanel;
+	private int[] epgTableWidth = { 60, 50, 50, 130, 70, 130, 130, 130, 80, 0 };
+	private final int EPG_TABLE_MAX_WIDTH = 1015;
 
 	/**
 	 * Create the application.
@@ -65,10 +83,6 @@ public class MainWindow {
 
 		initMenu();
 
-		initTitlePanel();
-
-		initContentPanel();
-
 		initTabPanel();
 	}
 
@@ -78,7 +92,17 @@ public class MainWindow {
 	private void initMainFrame() {
 		frmTs = new JFrame();
 		frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title"));
-		frmTs.setBounds(100, 100, 904, 623);
+		// 覆盖任务栏
+		// frmTs.getGraphicsConfiguration().getDevice().setFullScreenWindow(frmTs);
+		// 不覆盖任务栏
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Rectangle bounds = new Rectangle(screenSize);
+		Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(frmTs.getGraphicsConfiguration());
+		bounds.x += insets.left;
+		bounds.y += insets.top;
+		bounds.width -= insets.left + insets.right;
+		bounds.height -= insets.top + insets.bottom;
+		frmTs.setBounds(bounds);
 		frmTs.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
@@ -96,16 +120,11 @@ public class MainWindow {
 		epgTitlePanel.add(lbEpgTitle);
 		epgPanel.add(epgTitlePanel, BorderLayout.NORTH);
 
-		JPanel epgInfoPanel = new JPanel();
+		epgInfoPanel = new JPanel();
 		epgPanel.add(epgInfoPanel);
 		epgInfoPanel.setLayout(new BorderLayout(0, 0));
 
-		// TODO 初始化数据
-		EpgTableModel epgTableModel = new EpgTableModel(EpgTableInfoList.getInstance().getEpgTableInfolist());
-		programInfoTable = new JTable();
-		programInfoTable.setModel(epgTableModel);
-		JScrollPane scrollPane = new JScrollPane(programInfoTable);
-		epgInfoPanel.add(scrollPane, BorderLayout.CENTER);
+		initEpgTable();
 
 		JPanel tabPanel = new JPanel();
 		frmTs.getContentPane().add(tabPanel, BorderLayout.WEST);
@@ -118,7 +137,7 @@ public class MainWindow {
 		tabbedPane.addTab(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"), null, psisiTreePanel,
 				null);
 		psisiTreePanel.setBorder(null);
-		psisiTreePanel.setPreferredSize(new Dimension(290, 150));
+		psisiTreePanel.setPreferredSize(new Dimension(400, 150));
 		psisiTreePanel.setLayout(new BorderLayout(0, 0));
 
 		treeRoot = new DefaultMutableTreeNode("PSI/SI");
@@ -144,18 +163,83 @@ public class MainWindow {
 		programTypeList = new JList<Object>();
 		JScrollPane programTypeScrollPane = new JScrollPane(programTypeList);
 		programTypeListPanel.add(programTypeScrollPane, BorderLayout.CENTER);
+
+		programList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				List<EpgTableInfoBean> listTemp = new ArrayList<>();
+				for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
+					// TODO 改成获取数字
+					if (epgInfoBean.getServiceId() != 0 && programList.getSelectedValue() != null
+							&& ((String) programList.getSelectedValue()).substring(4)
+									.equals("" + epgInfoBean.getServiceId())) {
+						listTemp.add(epgInfoBean);
+					}
+				}
+				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
+				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				reflashEpgTable();
+			}
+		});
+
+		programTypeList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				List<EpgTableInfoBean> listTemp = new ArrayList<>();
+				for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
+					if (epgInfoBean.getProgramType() != null && programTypeList.getSelectedValue() != null
+							&& programTypeList.getSelectedValue().equals(epgInfoBean.getProgramType())) {
+						listTemp.add(epgInfoBean);
+					}
+				}
+				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
+				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				reflashEpgTable();
+			}
+		});
+
 	}
 
 	/**
-	 * 初始化标题窗口
+	 * 初始化Epg信息表
 	 */
-	private void initTitlePanel() {
+	private void initEpgTable() {
+		programInfoTable = new JTable();
+		epgTableModel = new EpgTableModel(EpgTableInfoList.getInstance().getEpgTableInfolist());
+		programInfoTable.setModel(epgTableModel);
+		programInfoTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);// 设置表格模式为单选
+		programInfoTable.getTableHeader().setReorderingAllowed(false);// 不能整列移动
+		programInfoTable.getTableHeader().setResizingAllowed(false);// 列大小不能调整
+		((DefaultTableCellRenderer) programInfoTable.getTableHeader().getDefaultRenderer())
+				.setHorizontalAlignment(JLabel.CENTER);// 表头内容居中
+		programInfoTable.setColumnModel(getColumn(programInfoTable, epgTableWidth, EPG_TABLE_MAX_WIDTH));
+		JScrollPane scrollPane = new JScrollPane(programInfoTable);
+		epgInfoPanel.add(scrollPane, BorderLayout.CENTER);
+
+		RowSorter<EpgTableModel> sorter = new TableRowSorter<EpgTableModel>(epgTableModel);
+		programInfoTable.setRowSorter(sorter);
 	}
 
 	/**
-	 * 初始化中间部分窗口
+	 * 设置EPG表格列宽度
+	 * 
+	 * @param table
+	 * @param width
+	 * @param maxWidth
+	 * @return
 	 */
-	private void initContentPanel() {
+	private TableColumnModel getColumn(JTable table, int[] width, int maxWidth) {
+		int otherLength = 0;
+		for (int i : width) {
+			otherLength += i;
+		}
+		width[width.length - 1] = maxWidth - otherLength;
+		TableColumnModel columns = table.getColumnModel();
+		for (int i = 0; i < width.length; i++) {
+			TableColumn column = columns.getColumn(i);
+			column.setPreferredWidth(width[i]);
+		}
+		return columns;
 	}
 
 	/**
@@ -341,6 +425,7 @@ public class MainWindow {
 					frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title") + "   " + filePath);
 					cleanData();
 					addTree();
+					new FillEpgDataThread().start();
 				} else {
 					logger.info("不是TS文件");
 				}
@@ -359,24 +444,31 @@ public class MainWindow {
 	private class ActionListener_Close implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			cleanData();
+			reflashData();
 		}
 	}
 
 	/**
-	 * 清空界面数据
+	 * 清空数据
 	 * 
 	 * @author Administrator
 	 */
 	private void cleanData() {
+		// 清空界面
 		programTypeList.removeAll();
 		programTypeList.repaint();
-		new LinkedList<String>();
-		ProgramTypeInfoList.getInstance().setProgramTypeList(new LinkedList<String>());
-		TableData.getInstance().setFinishedThreadCount(0);
+		programList.removeAll();
+		programList.repaint();
+		treeRoot.removeAllChildren();
+		// 清空数据
+		ProgramTypeInfoList.getInstance().init();
+		ProgramInfoList.getInstance().init();
+		TableData.getInstance().init();
+		EpgTableInfoList.getInstance().init();
 	}
 
 	/**
-	 * 刷新PSI/SI界面数据
+	 * 刷新界面数据
 	 * 
 	 * @author Administrator
 	 */
@@ -384,39 +476,83 @@ public class MainWindow {
 		treeModel.reload();
 		reflashProgramTypeList();
 		reflashProgramList();
+		reflashEpgTable();
 	}
 
+	/**
+	 * 刷新节目类型列表数据
+	 */
 	public static synchronized void reflashProgramTypeList() {
-		programTypeList.setModel(new AbstractListModel<Object>() {
-			private static final long serialVersionUID = -2625699078063016248L;
-			List<String> values = ProgramTypeInfoList.getInstance().getProgramTypeList();
+		if (ProgramTypeInfoList.getInstance().getProgramTypeList().size() > 0) {
+			programTypeList.setModel(new AbstractListModel<Object>() {
+				private static final long serialVersionUID = 1L;
+				List<String> values = ProgramTypeInfoList.getInstance().getProgramTypeList();
+				
+				public int getSize() {
+					return values.size();
+				}
+				
+				public Object getElementAt(int index) {
+					return values.get(index);
+				}
+			});
+		}else {
+			programTypeList.setModel(new AbstractListModel<Object>() {
+				private static final long serialVersionUID = 1L;
 
-			public int getSize() {
-				return values.size();
-			}
+				public int getSize() {
+					return 1;
+				}
 
-			public Object getElementAt(int index) {
-				return values.get(index);
-			}
-		});
+				public Object getElementAt(int index) {
+					return "无类型信息！";
+				}
+			});
+		}
 		programTypeList.validate();
 		programTypeList.repaint();
 	}
 
+	/**
+	 * 刷新节目列表数据
+	 */
 	public static synchronized void reflashProgramList() {
-		programList.setModel(new AbstractListModel<Object>() {
-			private static final long serialVersionUID = -1517802494832517338L;
-			List<Integer> values = ProgramInfoList.getInstance().getProgramIdList();
+		if (ProgramInfoList.getInstance().getProgramIdList().size() > 0) {
+			programList.setModel(new AbstractListModel<Object>() {
+				private static final long serialVersionUID = 1L;
+				List<Integer> values = ProgramInfoList.getInstance().getProgramIdList();
 
-			public int getSize() {
-				return values.size();
-			}
+				public int getSize() {
+					return values.size();
+				}
 
-			public Object getElementAt(int index) {
-				return values.get(index);
-			}
-		});
+				public Object getElementAt(int index) {
+					return "节目号：" + values.get(index);
+				}
+			});
+		} else {
+			programList.setModel(new AbstractListModel<Object>() {
+				private static final long serialVersionUID = 1L;
+
+				public int getSize() {
+					return 1;
+				}
+
+				public Object getElementAt(int index) {
+					return "无节目！";
+				}
+			});
+		}
+
 		programList.validate();
 		programList.repaint();
+	}
+
+	/**
+	 * 刷新Epg表数据方法
+	 */
+	public static synchronized void reflashEpgTable() {
+		// TOOD 考虑是否改为对数据进行操作时，相应的对Model进行操作
+		programInfoTable.revalidate();
 	}
 }

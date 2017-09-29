@@ -15,7 +15,7 @@ public class ProgramTypeInfoList {
 		this.programTypeList = programTypeList;
 	}
 	private ProgramTypeInfoList() {
-		programTypeList = new LinkedList<String>();
+		init();
 	}
 	public static ProgramTypeInfoList getInstance() {
 		if (instance != null) {// ¿¡∫∫ Ω
@@ -28,5 +28,9 @@ public class ProgramTypeInfoList {
 			}
 		}
 		return instance;
+	}
+	
+	public void init() {
+		programTypeList = new LinkedList<String>();
 	}
 }

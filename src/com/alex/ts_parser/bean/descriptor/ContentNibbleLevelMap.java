@@ -19,8 +19,9 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel1Map.put(0x9, "Education/Science/Factual topics");
 		contentNibbleLevel1Map.put(0xa, "Leisure hobbies");
 		contentNibbleLevel1Map.put(0xb, "Special characteristics");
+		contentNibbleLevel1Map.put(0xf, "User defined");
 	}
-	
+
 	static {
 		// Movie/Drama
 		contentNibbleLevel2Map.put(0x10, "movie/drama (general)");
@@ -32,20 +33,23 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel2Map.put(0x16, "romance");
 		contentNibbleLevel2Map.put(0x17, "serious/classical/religious/historical movie/drama");
 		contentNibbleLevel2Map.put(0x18, "adult movie/drama");
-		
+		contentNibbleLevel1Map.put(0x1f, "user defined");
+
 		// News/Current affairs
 		contentNibbleLevel2Map.put(0x20, "news/current affairs (general)");
 		contentNibbleLevel2Map.put(0x21, "news/weather report");
 		contentNibbleLevel2Map.put(0x22, "news magazine");
 		contentNibbleLevel2Map.put(0x23, "documentary");
 		contentNibbleLevel2Map.put(0x24, "discussion/interview/debate");
-		
+		contentNibbleLevel1Map.put(0x2f, "user defined");
+
 		// Show/Game show
 		contentNibbleLevel2Map.put(0x30, "show/game show (general)");
 		contentNibbleLevel2Map.put(0x31, "game show/quiz/contest");
 		contentNibbleLevel2Map.put(0x32, "variety show");
 		contentNibbleLevel2Map.put(0x33, "talk show");
-		
+		contentNibbleLevel1Map.put(0x3f, "user defined");
+
 		// Sports
 		contentNibbleLevel2Map.put(0x40, "sports (general)");
 		contentNibbleLevel2Map.put(0x41, "special events (Olympic Games,World Cup, etc)");
@@ -59,7 +63,8 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel2Map.put(0x49, "winter sport");
 		contentNibbleLevel2Map.put(0x4a, "equestrian");
 		contentNibbleLevel2Map.put(0x4b, "martial sports");
-		
+		contentNibbleLevel1Map.put(0x4f, "user defined");
+
 		// Children's/Youth programmes
 		contentNibbleLevel2Map.put(0x50, "children's/youth programmes (general)");
 		contentNibbleLevel2Map.put(0x51, "pre-school children's programmes");
@@ -67,7 +72,8 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel2Map.put(0x53, "entertainment programmes for 10 to 16");
 		contentNibbleLevel2Map.put(0x54, "informational/educational/school programmes");
 		contentNibbleLevel2Map.put(0x55, "catoons/puppets");
-		
+		contentNibbleLevel1Map.put(0x5f, "user defined");
+
 		// Music/Ballet/Dance
 		contentNibbleLevel2Map.put(0x60, "music/ballet/Dance (general)");
 		contentNibbleLevel2Map.put(0x61, "rock/pop");
@@ -76,7 +82,8 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel2Map.put(0x64, "jazz");
 		contentNibbleLevel2Map.put(0x65, "musical/opera");
 		contentNibbleLevel2Map.put(0x66, "ballet");
-		
+		contentNibbleLevel1Map.put(0x6f, "user defined");
+
 		// Arts/Culture
 		contentNibbleLevel2Map.put(0x70, "arts/culture (without music, general)");
 		contentNibbleLevel2Map.put(0x71, "performing arts");
@@ -90,13 +97,15 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel2Map.put(0x79, "new media");
 		contentNibbleLevel2Map.put(0x7a, "arts/culture magazines");
 		contentNibbleLevel2Map.put(0x7b, "fashion");
-		
+		contentNibbleLevel1Map.put(0x7f, "user defined");
+
 		// Social/Political issues/Economics
 		contentNibbleLevel2Map.put(0x80, "social/political issues/economics (general)");
 		contentNibbleLevel2Map.put(0x81, "magazines/reports/documentary");
 		contentNibbleLevel2Map.put(0x82, "economics/social advisory");
 		contentNibbleLevel2Map.put(0x83, "remarkable people");
-		
+		contentNibbleLevel1Map.put(0x8f, "user defined");
+
 		// Education/Science/Factual topics
 		contentNibbleLevel2Map.put(0x90, "education/science/factual topics (general)");
 		contentNibbleLevel2Map.put(0x91, "nature/animals/environment");
@@ -106,7 +115,8 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel2Map.put(0x95, "social/spiritual sciences");
 		contentNibbleLevel2Map.put(0x96, "further education");
 		contentNibbleLevel2Map.put(0x97, "languages");
-		
+		contentNibbleLevel1Map.put(0x9f, "user defined");
+
 		// Leisure hobbies
 		contentNibbleLevel2Map.put(0xa0, "leisure hobbies (general)");
 		contentNibbleLevel2Map.put(0xa1, "tourism/travel");
@@ -116,11 +126,13 @@ public class ContentNibbleLevelMap {
 		contentNibbleLevel2Map.put(0xa5, "cooking");
 		contentNibbleLevel2Map.put(0xa6, "advertisement/shopping");
 		contentNibbleLevel2Map.put(0xa7, "gardening");
-		
+		contentNibbleLevel1Map.put(0xaf, "user defined");
+
 		// Special characteristics
-		contentNibbleLevel2Map.put(0xa0, "original language");
-		contentNibbleLevel2Map.put(0xa1, "black and white");
-		contentNibbleLevel2Map.put(0xa2, "unpublished");
-		contentNibbleLevel2Map.put(0xa3, "live broadcast");
+		contentNibbleLevel2Map.put(0xb0, "original language");
+		contentNibbleLevel2Map.put(0xb1, "black and white");
+		contentNibbleLevel2Map.put(0xb2, "unpublished");
+		contentNibbleLevel2Map.put(0xb3, "live broadcast");
+		contentNibbleLevel1Map.put(0xbf, "user defined");
 	}
 }

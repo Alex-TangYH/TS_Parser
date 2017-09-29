@@ -172,20 +172,20 @@ public class ReflectUtils {
 						String nodeName = "";
 						switch (varName) {
 						case "contentNibbleLevel1":
-							String level1Name = ContentNibbleLevelMap.contentNibbleLevel1Map.get(o);
-							if (level1Name != null) {
-								nodeName = String.format("%s = %d(%s)", varName, o, level1Name);
-								boolean isTypeExist = false;
-								// 将类型数据存入类型数组中
-								for (int i = 0; i < ProgramTypeInfoList.getInstance().getProgramTypeList()
-										.size(); i++) {
-									if (level1Name
-											.equals(ProgramTypeInfoList.getInstance().getProgramTypeList().get(i))) {
-										isTypeExist = true;
-										break;
-									}
+							String defaultTypeValueOfContentNibbleLevel1 = "Reserved for future use";
+							String level1Name = ContentNibbleLevelMap.contentNibbleLevel1Map.getOrDefault(o,
+									defaultTypeValueOfContentNibbleLevel1);
+							nodeName = String.format("%s = %d(%s)", varName, o, level1Name);
+							boolean isTypeExist = false;
+							// 将类型数据存入类型数组中
+							for (int i = 0; i < ProgramTypeInfoList.getInstance().getProgramTypeList().size(); i++) {
+								if (level1Name.equals(ProgramTypeInfoList.getInstance().getProgramTypeList().get(i))) {
+									isTypeExist = true;
+									break;
 								}
+							}
 
+							if (ProgramTypeInfoList.getInstance() != null) {
 								int iLoopIndex = 0;
 								for (String type : ProgramTypeInfoList.getInstance().getProgramTypeList()) {
 									if (level1Name.equals(type)) {
@@ -197,19 +197,15 @@ public class ReflectUtils {
 								if (!isTypeExist) {
 									ProgramTypeInfoList.getInstance().getProgramTypeList().add(iLoopIndex, level1Name);
 								}
-
-							} else {
-								// TODO 输出保留类型
-								nodeName = String.format("%s = %d", varName, o);
 							}
-
 							break;
 						case "contentNibbleLevel2":
+							String defaultTypeValueOfContentNibbleLevel2 = "Reserved for future use";
 							nodeName = String.format("%s = %d(%s)", varName, o,
-									ContentNibbleLevelMap.contentNibbleLevel2Map.get(
-											new Integer(((ContentInfo) obj).getContentNibbleLevel1()) * 16 + (int) o));
+									ContentNibbleLevelMap.contentNibbleLevel2Map.getOrDefault(
+											new Integer(((ContentInfo) obj).getContentNibbleLevel1()) * 16 + (int) o,
+											defaultTypeValueOfContentNibbleLevel2));
 							break;
-
 						default:
 							nodeName = String.format("%s = %d", varName, o);
 							break;

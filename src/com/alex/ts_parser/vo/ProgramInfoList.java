@@ -1,6 +1,6 @@
 package com.alex.ts_parser.vo;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ProgramInfoList {
@@ -17,7 +17,7 @@ public class ProgramInfoList {
 	}
 
 	private ProgramInfoList() {
-		programBeanList = new ArrayList<>();
+		init();
 	}
 
 	public static ProgramInfoList getInstance() {
@@ -31,5 +31,9 @@ public class ProgramInfoList {
 			}
 		}
 		return instance;
+	}
+	
+	public void init() {
+		programBeanList = new LinkedList<>();
 	}
 }

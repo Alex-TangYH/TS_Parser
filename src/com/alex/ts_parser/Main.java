@@ -18,6 +18,8 @@ public class Main {
 			BeautyEyeLNFHelper.translucencyAtFrameInactive = false;
 			UIManager.put("RootPane.setupButtonVisible", false);
 			UIManager.put("TabbedPane.tabAreaInsets", new javax.swing.plaf.InsetsUIResource(3, 2, 2, 2));
+			BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.osLookAndFeelDecorated;
+	        org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
 		} catch (Exception e1) {
 		}
 

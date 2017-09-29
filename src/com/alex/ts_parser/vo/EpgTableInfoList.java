@@ -35,4 +35,8 @@ public class EpgTableInfoList {
 		}
 		return instance;
 	}
+	
+	public void init() {
+		epgTableInfolist.clear();
+	}
 }

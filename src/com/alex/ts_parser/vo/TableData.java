@@ -16,8 +16,8 @@ import com.alex.ts_parser.bean.si.TOT_Table;
 
 public class TableData {
 	volatile private static TableData instance = null;
-	
-	private int finishedThreadCount = 0;
+
+	private int finishedThreadCount;
 	private RST_Table rstTable;
 	private DIT_Table ditTable;
 	private ST_Table stTable;
@@ -25,6 +25,7 @@ public class TableData {
 	private TDT_Table tdtTable;
 	private SDT_Table sdtTable;
 	private SIT_Table sitTable;
+
 	private EIT_Table[] eitPfArrays;
 	private EIT_Table[] eitSchedule50Arrays;
 	private EIT_Table[] eitSchedule51Arrays;
@@ -35,6 +36,26 @@ public class TableData {
 	private NIT_Table nitTable;
 
 	private TableData() {
+		init();
+	}
+
+	public void init() {
+		this.finishedThreadCount = 0;
+		this.rstTable = null;
+		this.ditTable = null;
+		this.stTable = null;
+		this.totTable = null;
+		this.tdtTable = null;
+		this.sdtTable = null;
+		this.sitTable = null;
+		this.eitPfArrays = null;
+		this.eitSchedule50Arrays = null;
+		this.eitSchedule51Arrays = null;
+		this.batTable = null;
+		this.catTable = null;
+		this.patTable = null;
+		this.pmtTableArray = null;
+		this.nitTable = null;
 	}
 
 	public static TableData getInstance() {
@@ -49,7 +70,7 @@ public class TableData {
 		}
 		return instance;
 	}
-	
+
 	public RST_Table getRstTable() {
 		return rstTable;
 	}

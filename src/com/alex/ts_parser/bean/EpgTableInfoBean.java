@@ -1,19 +1,27 @@
 package com.alex.ts_parser.bean;
 
 public class EpgTableInfoBean {
+	public enum EIT_TYPE {
+	     P, F, S  
+	}
+	
+	private long serviceId;//节目号
 	private int eventId;//事件ID
 	private String startTime;//开始时间（本地）
 	private String duringTime;//持续时间
 	private String endTime;//结束时间
 	private String programTitle;//节目段标题
 	private String programType;//节目类型
-	private int programRating;//分级
+	private String programRating;//分级
 	private String briefIntroduction;//简介
 	private String detailedIntroduction;//详介
+	private EIT_TYPE type;
 	
-	public EpgTableInfoBean(int eventId, String startTime, String duringTime, String endTime, String programTitle,
-			String programType, int programRating, String briefIntroduction, String detailedIntroduction) {
+	public EpgTableInfoBean(long serviceId, int eventId, String startTime, String duringTime, String endTime,
+			String programTitle, String programType, String programRating, String briefIntroduction,
+			String detailedIntroduction, EIT_TYPE type) {
 		super();
+		this.serviceId = serviceId;
 		this.eventId = eventId;
 		this.startTime = startTime;
 		this.duringTime = duringTime;
@@ -23,6 +31,10 @@ public class EpgTableInfoBean {
 		this.programRating = programRating;
 		this.briefIntroduction = briefIntroduction;
 		this.detailedIntroduction = detailedIntroduction;
+		this.type = type;
+	}
+	
+	public EpgTableInfoBean() {
 	}
 	public int getEventId() {
 		return eventId;
@@ -60,10 +72,10 @@ public class EpgTableInfoBean {
 	public void setProgramType(String programType) {
 		this.programType = programType;
 	}
-	public int getProgramRating() {
+	public String getProgramRating() {
 		return programRating;
 	}
-	public void setProgramRating(int programRating) {
+	public void setProgramRating(String programRating) {
 		this.programRating = programRating;
 	}
 	public String getBriefIntroduction() {
@@ -77,5 +89,17 @@ public class EpgTableInfoBean {
 	}
 	public void setDetailedIntroduction(String detailedIntroduction) {
 		this.detailedIntroduction = detailedIntroduction;
+	}
+	public long getServiceId() {
+		return serviceId;
+	}
+	public void setServiceId(long serviceId) {
+		this.serviceId = serviceId;
+	}
+	public EIT_TYPE getType() {
+		return type;
+	}
+	public void setType(EIT_TYPE type) {
+		this.type = type;
 	}
 }

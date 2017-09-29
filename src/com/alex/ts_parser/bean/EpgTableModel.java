@@ -9,7 +9,7 @@ public class EpgTableModel extends AbstractTableModel {
 	 * 
 	 */
 	private static final long serialVersionUID = 882661073268427588L;
-	public static final int MODEL_COLUMN_COUNT = 8;
+	public static final int MODEL_COLUMN_COUNT = 10;
 
 	private List<EpgTableInfoBean> epgTableInfoBeanList;
 
@@ -38,51 +38,57 @@ public class EpgTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		switch (columnIndex) {  
-        case 0:  
-            return rowIndex+1+"";  
-        case 1:  
-            return this.epgTableInfoBeanList.get(rowIndex).getEventId();  
-        case 2:  
-            return this.epgTableInfoBeanList.get(rowIndex).getStartTime();  
-        case 3:  
-            return this.epgTableInfoBeanList.get(rowIndex).getDuringTime();  
-        case 4:  
-            return this.epgTableInfoBeanList.get(rowIndex).getEndTime();
-        case 5:  
-        	return this.epgTableInfoBeanList.get(rowIndex).getProgramTitle();
-        case 6:  
-        	return this.epgTableInfoBeanList.get(rowIndex).getProgramType();
-        case 7:  
-        	return this.epgTableInfoBeanList.get(rowIndex).getProgramRating();
-        case 8:  
-        	return this.epgTableInfoBeanList.get(rowIndex).getBriefIntroduction();
-        default:  
-            return "-";  
-        }  
+		switch (columnIndex) {
+		case 0:
+			return this.epgTableInfoBeanList.get(rowIndex).getServiceId();
+		case 1:
+			return this.epgTableInfoBeanList.get(rowIndex).getType();
+		case 2:
+			return this.epgTableInfoBeanList.get(rowIndex).getEventId();
+		case 3:
+			return this.epgTableInfoBeanList.get(rowIndex).getStartTime();
+		case 4:
+			return this.epgTableInfoBeanList.get(rowIndex).getDuringTime();
+		case 5:
+			return this.epgTableInfoBeanList.get(rowIndex).getEndTime();
+		case 6:
+			return this.epgTableInfoBeanList.get(rowIndex).getProgramTitle();
+		case 7:
+			return this.epgTableInfoBeanList.get(rowIndex).getProgramType();
+		case 8:
+			return this.epgTableInfoBeanList.get(rowIndex).getProgramRating();
+		case 9:
+			return this.epgTableInfoBeanList.get(rowIndex).getBriefIntroduction();
+		default:
+			return "-";
+		}
 	}
 
 	@Override
 	public String getColumnName(int column) {
-		switch (column) {  
-        case 0:  
-            return "事件ID";  
-        case 1:  
-            return "开始时间（本地）";  
-        case 2:  
-            return "持续时间";  
-        case 3:  
-            return "结束时间";  
-        case 4:  
-        	return "节目段标题";  
-        case 5:  
-        	return "节目类型";  
-        case 6:  
-        	return "分级";  
-        case 7:  
-        	return "简介";  
-        default:  
-            return "-";  
-        }  
+		switch (column) {
+		case 0:
+			return "节目号";
+		case 1:
+			return "P/F/S";
+		case 2:
+			return "事件ID";
+		case 3:
+			return "开始时间";
+		case 4:
+			return "持续时间";
+		case 5:
+			return "结束时间";
+		case 6:
+			return "节目段标题";
+		case 7:
+			return "节目类型";
+		case 8:
+			return "分级";
+		case 9:
+			return "简介";
+		default:
+			return "-";
+		}
 	}
 }
