@@ -48,8 +48,9 @@ import com.alex.ts_parser.vo.ProgramTypeInfoList;
 import com.alex.ts_parser.vo.TableData;
 
 public class MainWindow {
-
-	public JFrame frmTs;
+	public static ToastOfSwing toast;
+	public static FillEpgDataThread fillEpgDataThread;
+	public static JFrame frmTs;
 	private JMenuBar jmbMainMenuBar;
 	private Logger logger = LogManager.getLogger("MainWindow");
 	private String filePath = null;
@@ -167,34 +168,39 @@ public class MainWindow {
 		programList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				List<EpgTableInfoBean> listTemp = new ArrayList<>();
-				for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
-					// TODO 改成获取数字
-					if (epgInfoBean.getServiceId() != 0 && programList.getSelectedValue() != null
-							&& ((String) programList.getSelectedValue()).substring(4)
-									.equals("" + epgInfoBean.getServiceId())) {
-						listTemp.add(epgInfoBean);
+				if (programList.getSelectedValue() != null && !programList.getSelectedValue().equals("无节目！")
+						&& epgTableInfoListVo != null) {
+					List<EpgTableInfoBean> listTemp = new ArrayList<>();
+					for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
+						// TODO 改成获取数字
+						if (epgInfoBean.getServiceId() != 0 && ((String) programList.getSelectedValue()).substring(4)
+								.equals("" + epgInfoBean.getServiceId())) {
+							listTemp.add(epgInfoBean);
+						}
 					}
+					EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
+					EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+					reflashEpgTable();
 				}
-				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
-				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
-				reflashEpgTable();
 			}
 		});
 
 		programTypeList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				List<EpgTableInfoBean> listTemp = new ArrayList<>();
-				for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
-					if (epgInfoBean.getProgramType() != null && programTypeList.getSelectedValue() != null
-							&& programTypeList.getSelectedValue().equals(epgInfoBean.getProgramType())) {
-						listTemp.add(epgInfoBean);
+				if (programTypeList.getSelectedValue() != null
+						&& !programTypeList.getSelectedValue().equals("无类型信息！")) {
+					List<EpgTableInfoBean> listTemp = new ArrayList<>();
+					for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
+						if (epgInfoBean.getProgramType() != null
+								&& programTypeList.getSelectedValue().equals(epgInfoBean.getProgramType())) {
+							listTemp.add(epgInfoBean);
+						}
 					}
+					EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
+					EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+					reflashEpgTable();
 				}
-				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
-				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
-				reflashEpgTable();
 			}
 		});
 
@@ -424,8 +430,13 @@ public class MainWindow {
 				} else if (TS_Utils.isTsFile(filePath)) {
 					frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title") + "   " + filePath);
 					cleanData();
+					reflashData();
 					addTree();
-					new FillEpgDataThread().start();
+					fillEpgDataThread = new FillEpgDataThread();
+					frmTs.setEnabled(false);
+
+					toast = new ToastOfSwing(frmTs, "解析中，请稍候", 0, ToastOfSwing.msg);
+					toast.setVisible(true);
 				} else {
 					logger.info("不是TS文件");
 				}
@@ -453,7 +464,7 @@ public class MainWindow {
 	 * 
 	 * @author Administrator
 	 */
-	private void cleanData() {
+	private static void cleanData() {
 		// 清空界面
 		programTypeList.removeAll();
 		programTypeList.repaint();
@@ -472,7 +483,7 @@ public class MainWindow {
 	 * 
 	 * @author Administrator
 	 */
-	public static synchronized void reflashData() {
+	public static void reflashData() {
 		treeModel.reload();
 		reflashProgramTypeList();
 		reflashProgramList();
@@ -487,16 +498,16 @@ public class MainWindow {
 			programTypeList.setModel(new AbstractListModel<Object>() {
 				private static final long serialVersionUID = 1L;
 				List<String> values = ProgramTypeInfoList.getInstance().getProgramTypeList();
-				
+
 				public int getSize() {
 					return values.size();
 				}
-				
+
 				public Object getElementAt(int index) {
 					return values.get(index);
 				}
 			});
-		}else {
+		} else {
 			programTypeList.setModel(new AbstractListModel<Object>() {
 				private static final long serialVersionUID = 1L;
 

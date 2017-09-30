@@ -309,10 +309,13 @@ public class AddTableThread extends Thread {
 				break;
 			}
 		} catch (Exception e) {
-			logger.info("ณ๖ดํมห" + e);
+			logger.error("getTreeByObjAttr", e);
 		} finally {
-			MainWindow.reflashData();
 			TableData.getInstance().setFinishedThreadCount(TableData.getInstance().getFinishedThreadCount() + 1);
+			if(TableData.getInstance().getFinishedThreadCount() == 15) {
+				MainWindow.reflashData();
+				MainWindow.fillEpgDataThread.start();
+			}
 		}
 	}
 }

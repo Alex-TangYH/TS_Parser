@@ -1,10 +1,6 @@
 package com.alex.ts_parser;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 
 import com.alex.ts_parser.bean.EpgTableInfoBean;
 import com.alex.ts_parser.bean.EpgTableInfoBean.EIT_TYPE;
@@ -18,6 +14,8 @@ import com.alex.ts_parser.bean.descriptor.ShortEventDescriptor;
 import com.alex.ts_parser.bean.si.EIT_Table;
 import com.alex.ts_parser.bean.si.EitInfo;
 import com.alex.ts_parser.ui.MainWindow;
+import com.alex.ts_parser.ui.ToastOfSwing;
+import com.alex.ts_parser.utils.TS_Utils;
 import com.alex.ts_parser.vo.EpgTableInfoList;
 import com.alex.ts_parser.vo.TableData;
 
@@ -30,19 +28,22 @@ public class FillEpgDataThread extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
-			if (TableData.getInstance().getFinishedThreadCount() == 15) {
-				// 装填数据
-				EIT_Table[] eitData = TableData.getInstance().getEitPfArrays();
-				EIT_Table[] eit50Data = TableData.getInstance().getEitSchedule50Arrays();
-				EIT_Table[] eit51Data = TableData.getInstance().getEitSchedule51Arrays();
-				getEpgTableDataFromEit(eitData);
-				getEpgTableDataFromEit(eit50Data);
-				getEpgTableDataFromEit(eit51Data);
-				MainWindow.epgTableInfoListVo = new ArrayList<>(EpgTableInfoList.getInstance().getEpgTableInfolist());
-				MainWindow.programInfoTable.revalidate();
-				break;
-			}
+		try {
+			EIT_Table[] eitData = TableData.getInstance().getEitPfArrays();
+			EIT_Table[] eit50Data = TableData.getInstance().getEitSchedule50Arrays();
+			EIT_Table[] eit51Data = TableData.getInstance().getEitSchedule51Arrays();
+			getEpgTableDataFromEit(eitData);
+			getEpgTableDataFromEit(eit50Data);
+			getEpgTableDataFromEit(eit51Data);
+			MainWindow.epgTableInfoListVo = new ArrayList<>(EpgTableInfoList.getInstance().getEpgTableInfolist());
+		} catch (Exception e) {
+			// TODO: handle exception
+		} finally {
+			MainWindow.programInfoTable.revalidate();
+			MainWindow.frmTs.setEnabled(true);
+			MainWindow.toast.setVisible(false);
+			final ToastOfSwing toast = new ToastOfSwing(MainWindow.frmTs, "解析完成！", 1000, ToastOfSwing.msg);
+			toast.start();
 		}
 	}
 
@@ -83,9 +84,10 @@ public class FillEpgDataThread extends Thread {
 				// TODO 需要做时间偏移处理,并将列名修改为（本地）
 				long[] startTime = eitInfo.getStartTimeArray();
 				String strStartTime = String.format("%s %02x:%02x:%02x",
-						MJDtoUTC(startTime[0] * 16 * 16 + startTime[1]), startTime[2], startTime[3], startTime[4]);
+						TS_Utils.mjd2Utc(startTime[0] * 16 * 16 + startTime[1]), startTime[2], startTime[3],
+						startTime[4]);
 				epgTableInfoBean.setStartTime(strStartTime);
-				epgTableInfoBean.setEndTime(addTime2Time(strStartTime, strDuringTime));
+				epgTableInfoBean.setEndTime(TS_Utils.addTime2Time(strStartTime, strDuringTime));
 				for (Descriptor d : eitInfo.getDescriptorArray()) {
 					if (d instanceof ShortEventDescriptor) {
 						if (((ShortEventDescriptor) d).getEventNameChar() != null) {
@@ -132,48 +134,4 @@ public class FillEpgDataThread extends Thread {
 			}
 		}
 	}
-
-	/**
-	 * 计算两个时间相加，
-	 * 
-	 * @param strStartTime
-	 *            格式： yyyy/MM/dd HH:mm:ss
-	 * @param strDuringTime
-	 *            格式: HH:mm:ss
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	private String addTime2Time(String strStartTime, String strDuringTime) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date(strStartTime));
-		cal.add(Calendar.HOUR_OF_DAY, new Integer(strDuringTime.substring(0, 2)));
-		cal.add(Calendar.MINUTE, new Integer(strDuringTime.substring(3, 5)));
-		cal.add(Calendar.SECOND, new Integer(strDuringTime.substring(6, 8)));
-		return sdf.format(cal.getTime());
-	}
-
-	/**
-	 * MJD格式转UTC
-	 * 
-	 * @param iMJD
-	 * @return
-	 */
-	private String MJDtoUTC(long iMJD) {
-		int k = -1;
-		int iYear = (int) (((float) iMJD - 15078.2) / 365.25);
-		int iMomth = (int) (((float) iMJD - 14956.1 - (int) (iYear * 365.25)) / 30.6001);
-		int iDay = (int) (iMJD - 14956 - (int) (iYear * 365.25) - (int) (iMomth * 30.6001));
-		if (iMomth == 14 || iMomth == 15) {
-			k = 1;
-		} else {
-			k = 0;
-		}
-
-		iYear += k;
-		iMomth = iMomth - 1 - k * 12;
-
-		return String.format("%04d/%02d/%02d", iYear + 1900, iMomth, iDay);
-	}
-
 }

@@ -24,8 +24,7 @@ public class NativeFunctionManager {
 	public static final int EIT_PF_ACTUAL = 1;
 	public static final int EIT_OTHER_50 = 2;
 	public static final int EIT_OTHER_51 = 3;
-	
-	
+
 	public native static int parseTSFileNative(String filePath);
 
 	public native static TestClass parseAge();

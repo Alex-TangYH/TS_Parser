@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: lib/beautyeye_lnf.jar lib/log4j-api-2.9.0.jar lib/log4j-core-2.9.0.jar lib/miglayout-core.jar lib/miglayout-swing.jar 
+Main-Class: com.alex.ts_parser.Main
+
