@@ -2,6 +2,9 @@ package com.alex.ts_parser;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.alex.ts_parser.bean.EpgTableInfoBean;
 import com.alex.ts_parser.bean.EpgTableInfoBean.EIT_TYPE;
 import com.alex.ts_parser.bean.descriptor.ContentDescriptor;
@@ -21,6 +24,8 @@ import com.alex.ts_parser.vo.TableData;
 
 public class FillEpgDataThread extends Thread {
 	// TODO 这个类里做的数据格式处理，全部需要在反射树上做一遍
+	private static Logger logger = LogManager.getLogger("FillEpgDataThread");
+
 	@Override
 	public synchronized void start() {
 		super.start();
@@ -29,15 +34,19 @@ public class FillEpgDataThread extends Thread {
 	@Override
 	public void run() {
 		try {
-			EIT_Table[] eitData = TableData.getInstance().getEitPfArrays();
-			EIT_Table[] eit50Data = TableData.getInstance().getEitSchedule50Arrays();
-			EIT_Table[] eit51Data = TableData.getInstance().getEitSchedule51Arrays();
+			EIT_Table[] eitPfActualData = TableData.getInstance().getEitPfArrays();
+			EIT_Table[] eitSchedule50Data = TableData.getInstance().getEitSchedule50Arrays();
+			EIT_Table[] eitSchedule51Data = TableData.getInstance().getEitSchedule51Arrays();
+			EIT_Table[] eitData = new EIT_Table[eitPfActualData.length + eitSchedule50Data.length
+					+ eitSchedule51Data.length];
+			System.arraycopy(eitPfActualData, 0, eitData, 0, eitPfActualData.length);
+			System.arraycopy(eitSchedule50Data, 0, eitData, eitPfActualData.length, eitSchedule50Data.length);
+			System.arraycopy(eitSchedule51Data, 0, eitData, eitPfActualData.length + eitSchedule50Data.length,
+					eitSchedule51Data.length);
 			getEpgTableDataFromEit(eitData);
-			getEpgTableDataFromEit(eit50Data);
-			getEpgTableDataFromEit(eit51Data);
 			MainWindow.epgTableInfoListVo = new ArrayList<>(EpgTableInfoList.getInstance().getEpgTableInfolist());
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (Exception ex) {
+			logger.error("run()", ex);
 		} finally {
 			MainWindow.programInfoTable.revalidate();
 			MainWindow.frmTs.setEnabled(true);
@@ -101,11 +110,12 @@ public class FillEpgDataThread extends Thread {
 						}
 					} else if (d instanceof ContentDescriptor) {
 						ContentInfo[] contentInfos = ((ContentDescriptor) d).getContentInfoArray();
+						String strProgramType = "";
 						for (ContentInfo contentInfo : contentInfos) {
-							epgTableInfoBean.setProgramType(ContentNibbleLevelMap.contentNibbleLevel1Map
-									.getOrDefault(contentInfo.getContentNibbleLevel1(), "Reserved for future use"));
-							break;
+							strProgramType += ContentNibbleLevelMap.contentNibbleLevel1Map.getOrDefault(
+									contentInfo.getContentNibbleLevel1(), "Reserved for future use") + ";";
 						}
+						epgTableInfoBean.setProgramType(strProgramType);
 					} else if (d instanceof ParentalRatingDescriptor) {
 						ParentalRatingInfo[] parentalRatingInfos = ((ParentalRatingDescriptor) d)
 								.getParentalRatingInfoArray();

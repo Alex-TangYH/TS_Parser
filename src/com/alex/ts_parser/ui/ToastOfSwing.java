@@ -19,9 +19,6 @@ import javax.swing.JWindow;
 /**
  * 吐司提示框组件
  * 
- * 
- * @author ccw
- * @since:2014-2-28
  */
 public class ToastOfSwing extends JWindow {
 
@@ -67,7 +64,6 @@ public class ToastOfSwing extends JWindow {
 		// 相对JFrame的位置
 		setLocationRelativeTo(parent);
 		installTheme(type);
-
 	}
 
 	@Override

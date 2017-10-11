@@ -7,7 +7,7 @@ public class DescriptorMap {
 	public static Map<Integer, String> descriptorNameMap = new HashMap<Integer, String>();
 
 	static {
-		// TODO 把所有描述子ID和名字输入，并将此类中所有字符提取到资源文件统一管理
+		// OPT 把所有描述子ID和名字输入
 		descriptorNameMap.put(2, "VideoStreamDescriptor");
 		descriptorNameMap.put(3, "AudioStreamDescriptor");
 		descriptorNameMap.put(6, "DataStreamAlignmentDescriptor");

@@ -58,20 +58,4 @@ public class NativeFunctionManager {
 	public native static ST_Table parseST(String filePath);
 
 	public native static SIT_Table parseSIT(String filePath);
-
-	// µ¥Àý
-	private NativeFunctionManager() {
-	}
-
-	public static NativeFunctionManager getNativeFunctionManager() {
-		if (nativeFunctionManager == null) {
-			synchronized (NativeFunctionManager.class) {
-				if (nativeFunctionManager == null) {
-					nativeFunctionManager = new NativeFunctionManager();
-				}
-			}
-		}
-		return nativeFunctionManager;
-	}
-
 }

@@ -128,6 +128,9 @@ public class TableData {
 	}
 
 	public EIT_Table[] getEitPfArrays() {
+		if(eitPfArrays == null) {
+			return new EIT_Table[0];
+		}
 		return eitPfArrays;
 	}
 
@@ -136,6 +139,9 @@ public class TableData {
 	}
 
 	public EIT_Table[] getEitSchedule50Arrays() {
+		if(eitSchedule50Arrays == null) {
+			return new EIT_Table[0];
+		}
 		return eitSchedule50Arrays;
 	}
 
@@ -144,6 +150,9 @@ public class TableData {
 	}
 
 	public EIT_Table[] getEitSchedule51Arrays() {
+		if(eitSchedule51Arrays == null) {
+			return new EIT_Table[0];
+		}
 		return eitSchedule51Arrays;
 	}
 

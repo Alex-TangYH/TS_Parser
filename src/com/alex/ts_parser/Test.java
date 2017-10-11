@@ -23,7 +23,8 @@ import com.alex.ts_parser.utils.StringResocesHelper;
 
 public class Test {
 	private static Logger logger = LogManager.getLogger("Test");
-	private static String filePath = "D:\\test\\test_ca.ts";
+//	private static String filePath = "D:\\test\\test_ca.ts";
+	private static String filePath = "D:\\test\\program.ts";
 	public Test() {
 	}
 
@@ -141,6 +142,8 @@ public class Test {
 		ReflectUtils.getObjAttr(eitArray);
 		EIT_Table[] eitArray2 = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_OTHER_50);
 		ReflectUtils.getObjAttr(eitArray2);
+		EIT_Table[] eitArray3 = NativeFunctionManager.parseEIT(filePath, NativeFunctionManager.EIT_OTHER_51);
+		ReflectUtils.getObjAttr(eitArray3);
 	}
 	
 	/**

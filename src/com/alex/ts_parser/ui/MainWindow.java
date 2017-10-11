@@ -8,9 +8,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractListModel;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,14 +36,18 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.alex.ts_parser.AddTableThread;
+import com.alex.ts_parser.AddTableThread.SiTableType;
+import com.alex.ts_parser.AddTableThread.PsiTableType;
 import com.alex.ts_parser.FillEpgDataThread;
 import com.alex.ts_parser.bean.EpgTableInfoBean;
 import com.alex.ts_parser.bean.EpgTableModel;
+import com.alex.ts_parser.bean.psi.PAT_ProgramInfo;
 import com.alex.ts_parser.utils.StringResocesHelper;
 import com.alex.ts_parser.utils.TS_Utils;
 import com.alex.ts_parser.vo.EpgTableInfoList;
@@ -55,7 +63,7 @@ public class MainWindow {
 	private Logger logger = LogManager.getLogger("MainWindow");
 	private String filePath = null;
 	private String fileName = null;
-	private JTree jTree;
+	private static JTree jTree;
 	public static JTable programInfoTable;
 	public static DefaultMutableTreeNode treeRoot;
 	public static MyTreeModel treeModel;
@@ -84,7 +92,36 @@ public class MainWindow {
 
 		initMenu();
 
+		initMainPanel();
+	}
+
+	/**
+	 * 初始化窗口主体内容
+	 */
+	private void initMainPanel() {
 		initTabPanel();
+
+		initEpgPanel();
+	}
+
+	/**
+	 * 初始化epg内容
+	 * 
+	 * @param epgPanel
+	 *            epg内容容器
+	 */
+	private void initEpgPanel() {
+		JPanel epgPanel = new JPanel();
+		epgPanel.setBorder(null);
+		frmTs.getContentPane().add(epgPanel, BorderLayout.CENTER);
+		epgPanel.setLayout(new BorderLayout(0, 0));
+
+		epgInfoPanel = new JPanel();
+		epgPanel.add(epgInfoPanel);
+		epgInfoPanel.setLayout(new BorderLayout(0, 0));
+
+		initEpgTitlePanel(epgPanel);
+		initEpgTable();
 	}
 
 	/**
@@ -108,25 +145,31 @@ public class MainWindow {
 	}
 
 	/**
+	 * 初始化EPG标题部分容器
+	 * 
+	 * @param parentPanel
+	 *            epg标题父容器
+	 */
+	private void initEpgTitlePanel(JPanel parentPanel) {
+		JPanel epgTitlePanel = new JPanel();
+		epgTitlePanel.setLayout(new BorderLayout(0, 0));
+		JLabel lbEpgTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.EPGTitle"),
+				JLabel.CENTER);
+		epgTitlePanel.add(lbEpgTitle);
+		parentPanel.add(epgTitlePanel, BorderLayout.NORTH);
+
+		JPanel epgButtunPanel = new JPanel();
+		epgTitlePanel.add(epgButtunPanel, BorderLayout.EAST);
+
+		JButton btnShowAllEpg = new JButton(StringResocesHelper.getStringByKey("MainWindow.ShowAllEpg"));
+		epgButtunPanel.add(btnShowAllEpg);
+		btnShowAllEpg.addActionListener(new showAllEpgBtnActionListener());
+	}
+
+	/**
 	 * 初始化选项卡窗口
 	 */
 	private void initTabPanel() {
-		JPanel epgPanel = new JPanel();
-		epgPanel.setBorder(null);
-		frmTs.getContentPane().add(epgPanel, BorderLayout.CENTER);
-		epgPanel.setLayout(new BorderLayout(0, 0));
-
-		JPanel epgTitlePanel = new JPanel();
-		JLabel lbEpgTitle = new JLabel(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.EPGTitle"));
-		epgTitlePanel.add(lbEpgTitle);
-		epgPanel.add(epgTitlePanel, BorderLayout.NORTH);
-
-		epgInfoPanel = new JPanel();
-		epgPanel.add(epgInfoPanel);
-		epgInfoPanel.setLayout(new BorderLayout(0, 0));
-
-		initEpgTable();
-
 		JPanel tabPanel = new JPanel();
 		frmTs.getContentPane().add(tabPanel, BorderLayout.WEST);
 		tabPanel.setLayout(new BorderLayout(0, 0));
@@ -134,29 +177,15 @@ public class MainWindow {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabPanel.add(tabbedPane);
 
-		psisiTreePanel = new JPanel();
-		tabbedPane.addTab(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"), null, psisiTreePanel,
-				null);
-		psisiTreePanel.setBorder(null);
-		psisiTreePanel.setPreferredSize(new Dimension(400, 150));
-		psisiTreePanel.setLayout(new BorderLayout(0, 0));
+		initTreeTab(tabbedPane);
 
-		treeRoot = new DefaultMutableTreeNode("PSI/SI");
-		treeModel = new MyTreeModel(treeRoot);
-		jTree = new JTree(treeModel);
+		initProgramListTab(tabbedPane);
 
-		psisiScrollPane = new JScrollPane();
-		psisiScrollPane.setViewportView(jTree);
-		psisiTreePanel.add(psisiScrollPane, BorderLayout.CENTER);
+		initProgramTypeTab(tabbedPane);
 
-		JPanel programListPanel = new JPanel();
-		tabbedPane.addTab("节目列表", null, programListPanel, null);
-		programListPanel.setLayout(new BorderLayout(0, 0));
+	}
 
-		programList = new JList<Object>();
-		JScrollPane programInfoScrollPane = new JScrollPane(programList);
-		programListPanel.add(programInfoScrollPane, BorderLayout.CENTER);
-
+	private void initProgramTypeTab(JTabbedPane tabbedPane) {
 		JPanel programTypeListPanel = new JPanel();
 		tabbedPane.addTab("节目类别", null, programTypeListPanel, null);
 		programTypeListPanel.setLayout(new BorderLayout(0, 0));
@@ -164,46 +193,35 @@ public class MainWindow {
 		programTypeList = new JList<Object>();
 		JScrollPane programTypeScrollPane = new JScrollPane(programTypeList);
 		programTypeListPanel.add(programTypeScrollPane, BorderLayout.CENTER);
+		programTypeList.addListSelectionListener(new programTypeListSelectionListener());
+	}
 
-		programList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (programList.getSelectedValue() != null && !programList.getSelectedValue().equals("无节目！")
-						&& epgTableInfoListVo != null) {
-					List<EpgTableInfoBean> listTemp = new ArrayList<>();
-					for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
-						// TODO 改成获取数字
-						if (epgInfoBean.getServiceId() != 0 && ((String) programList.getSelectedValue()).substring(4)
-								.equals("" + epgInfoBean.getServiceId())) {
-							listTemp.add(epgInfoBean);
-						}
-					}
-					EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
-					EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
-					reflashEpgTable();
-				}
-			}
-		});
+	private void initProgramListTab(JTabbedPane tabbedPane) {
+		JPanel programListPanel = new JPanel();
+		tabbedPane.addTab("节目列表", null, programListPanel, null);
+		programListPanel.setLayout(new BorderLayout(0, 0));
 
-		programTypeList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (programTypeList.getSelectedValue() != null
-						&& !programTypeList.getSelectedValue().equals("无类型信息！")) {
-					List<EpgTableInfoBean> listTemp = new ArrayList<>();
-					for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
-						if (epgInfoBean.getProgramType() != null
-								&& programTypeList.getSelectedValue().equals(epgInfoBean.getProgramType())) {
-							listTemp.add(epgInfoBean);
-						}
-					}
-					EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
-					EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
-					reflashEpgTable();
-				}
-			}
-		});
+		programList = new JList<Object>();
+		JScrollPane programInfoScrollPane = new JScrollPane(programList);
+		programListPanel.add(programInfoScrollPane, BorderLayout.CENTER);
+		programList.addListSelectionListener(new programListSelectionListener());
+	}
 
+	private void initTreeTab(JTabbedPane tabbedPane) {
+		psisiTreePanel = new JPanel();
+		tabbedPane.addTab(StringResocesHelper.getStringByKey("MainWindow.TitlePanel.Title"), null, psisiTreePanel,
+				null);
+		psisiTreePanel.setBorder(null);
+		psisiTreePanel.setPreferredSize(new Dimension(400, 150));
+		psisiTreePanel.setLayout(new BorderLayout(0, 0));
+
+		treeRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("Tree.root"));
+		treeModel = new MyTreeModel(treeRoot);
+		jTree = new JTree(treeModel);
+
+		psisiScrollPane = new JScrollPane();
+		psisiScrollPane.setViewportView(jTree);
+		psisiTreePanel.add(psisiScrollPane, BorderLayout.CENTER);
 	}
 
 	/**
@@ -269,7 +287,7 @@ public class MainWindow {
 
 		JMenuItem mniHelp = new JMenuItem(StringResocesHelper.getStringByKey("MainWindow.MenuBar.MenuItem.Help"));
 		jmbMainMenuBar.add(mniHelp);
-		// TODO 增加助记符
+		// OPT 增加助记符
 	}
 
 	/**
@@ -278,137 +296,40 @@ public class MainWindow {
 	 * @param jPanel
 	 */
 	private void addTree() {
-		// 树根
-		addPsiTableNode(treeRoot);
-		addSiTableNode(treeRoot);
+		addPsi(treeRoot);
+		addSi(treeRoot);
 	}
 
 	/**
-	 * 添加PSI表到treeRoot
+	 * 添加si表到parentNode节点
 	 * 
-	 * @param treeRoot
+	 * @param parentNode
 	 */
-	private void addPsiTableNode(DefaultMutableTreeNode treeRoot) {
-		DefaultMutableTreeNode psiRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI"));
-		treeRoot.add(psiRoot);
-
-		// cat表
-		DefaultMutableTreeNode catRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.CAT"));
-		psiRoot.add(catRoot);
-		AddTableThread addCatTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.CAT"), catRoot,
-				filePath);
-		addCatTableThread.start();
-
-		// nit表
-		DefaultMutableTreeNode nitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.NIT"));
-		psiRoot.add(nitRoot);
-		AddTableThread addNitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.NIT"), nitRoot,
-				filePath);
-		addNitTableThread.start();
-
-		// pat表
-		DefaultMutableTreeNode patRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PAT"));
-		psiRoot.add(patRoot);
-		AddTableThread addPatTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.PAT"), patRoot,
-				filePath);
-		addPatTableThread.start();
-
-		// pmt表
-		DefaultMutableTreeNode pmtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI.PMT"));
-		psiRoot.add(pmtRoot);
-		AddTableThread addPmtTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.PSI.PMT"), pmtRoot,
-				filePath);
-		addPmtTableThread.start();
-	}
-
-	/**
-	 * 添加si表树到treeRoot节点
-	 * 
-	 * @param treeRoot
-	 */
-	private void addSiTableNode(DefaultMutableTreeNode treeRoot) {
+	private void addSi(DefaultMutableTreeNode parentNode) {
 		DefaultMutableTreeNode siRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI"));
-		treeRoot.add(siRoot);
+		parentNode.add(siRoot);
+		for (SiTableType type : SiTableType.values()) {
+			DefaultMutableTreeNode siTableNode = new DefaultMutableTreeNode(type);
+			siRoot.add(siTableNode);
+			AddTableThread addTableThread = new AddTableThread(type, siTableNode, filePath);
+			addTableThread.start();
+		}
+	}
 
-		// sdt表
-		DefaultMutableTreeNode sdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.SDT"));
-		siRoot.add(sdtRoot);
-		AddTableThread addSdtTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.SDT"), sdtRoot,
-				filePath);
-		addSdtTableThread.start();
-
-		// tdt表
-		DefaultMutableTreeNode tdtRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.TDT"));
-		siRoot.add(tdtRoot);
-		AddTableThread addTdtTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.TDT"), tdtRoot,
-				filePath);
-		addTdtTableThread.start();
-
-		// tot表
-		DefaultMutableTreeNode totRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.TOT"));
-		siRoot.add(totRoot);
-		AddTableThread addTotTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.TOT"), totRoot,
-				filePath);
-		addTotTableThread.start();
-
-		// st表
-		DefaultMutableTreeNode stRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.ST"));
-		siRoot.add(stRoot);
-		AddTableThread addStTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.ST"), stRoot,
-				filePath);
-		addStTableThread.start();
-
-		// dit表
-		DefaultMutableTreeNode ditRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.DIT"));
-		siRoot.add(ditRoot);
-		AddTableThread addDitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.DIT"), ditRoot,
-				filePath);
-		addDitTableThread.start();
-
-		// rst表
-		DefaultMutableTreeNode rstRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.RST"));
-		siRoot.add(rstRoot);
-		AddTableThread addRstTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.RST"), rstRoot,
-				filePath);
-		addRstTableThread.start();
-
-		// sit表
-		DefaultMutableTreeNode sitRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.SIT"));
-		siRoot.add(sitRoot);
-		AddTableThread addSitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.SIT"), sitRoot,
-				filePath);
-		addSitTableThread.start();
-
-		// eit表
-		DefaultMutableTreeNode eitRoot = new DefaultMutableTreeNode(
-				StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"));
-		siRoot.add(eitRoot);
-		AddTableThread addEitTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.EIT_PF_Actual"),
-				eitRoot, filePath);
-		addEitTableThread.start();
-
-		// eit表(0x50)
-		DefaultMutableTreeNode eitOther50Root = new DefaultMutableTreeNode(
-				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_50"));
-		siRoot.add(eitOther50Root);
-		AddTableThread addEitOther50TableThread = new AddTableThread(
-				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_50"), eitOther50Root, filePath);
-		addEitOther50TableThread.start();
-
-		// eit表(0x51)
-		DefaultMutableTreeNode eitOther51Root = new DefaultMutableTreeNode(
-				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_51"));
-		siRoot.add(eitOther51Root);
-		AddTableThread addEitOther51TableThread = new AddTableThread(
-				StringResocesHelper.getStringByKey("TS.SI.EIT_Schedule_Actual_51"), eitOther51Root, filePath);
-		addEitOther51TableThread.start();
-
-		// bat表
-		DefaultMutableTreeNode batRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.SI.BAT"));
-		siRoot.add(batRoot);
-		AddTableThread addBatTableThread = new AddTableThread(StringResocesHelper.getStringByKey("TS.SI.BAT"), batRoot,
-				filePath);
-		addBatTableThread.start();
+	/**
+	 * 添加Psi表到parentNode节点
+	 * 
+	 * @param parentNode
+	 */
+	private void addPsi(DefaultMutableTreeNode parentNode) {
+		DefaultMutableTreeNode psiRoot = new DefaultMutableTreeNode(StringResocesHelper.getStringByKey("TS.PSI"));
+		parentNode.add(psiRoot);
+		for (PsiTableType type : PsiTableType.values()) {
+			DefaultMutableTreeNode psiTableNode = new DefaultMutableTreeNode(type);
+			psiRoot.add(psiTableNode);
+			AddTableThread addTableThread = new AddTableThread(type, psiTableNode, filePath);
+			addTableThread.start();
+		}
 	}
 
 	/**
@@ -427,18 +348,19 @@ public class MainWindow {
 				logger.info("当前文件路径：" + filePath + ";当前文件名：" + fileName);
 				if (filePath == null || filePath.isEmpty()) {
 					logger.info("没有选中文件");
-				} else if (TS_Utils.isTsFile(filePath)) {
+				} else if (TS_Utils.isResolvableFile(filePath)) {
 					frmTs.setTitle(StringResocesHelper.getStringByKey("MainWindow.FrmTS.Title") + "   " + filePath);
 					cleanData();
 					reflashData();
 					addTree();
 					fillEpgDataThread = new FillEpgDataThread();
 					frmTs.setEnabled(false);
-
 					toast = new ToastOfSwing(frmTs, "解析中，请稍候", 0, ToastOfSwing.msg);
 					toast.setVisible(true);
 				} else {
-					logger.info("不是TS文件");
+					logger.info("不是ts、mts、trp文件");
+					toast = new ToastOfSwing(frmTs, "无法解析此类型文件", 2000, ToastOfSwing.msg);
+					toast.start();
 				}
 			} else {
 				logger.info("没有选中文件");
@@ -485,9 +407,33 @@ public class MainWindow {
 	 */
 	public static void reflashData() {
 		treeModel.reload();
+		expandNode(treeRoot, jTree);
+
 		reflashProgramTypeList();
 		reflashProgramList();
 		reflashEpgTable();
+	}
+
+	/**
+	 * 展开第一层节点
+	 */
+	private static void expandNode(DefaultMutableTreeNode node, JTree tree) {
+		int childCountAt1Leave = node.getChildCount();
+		for (int i = 0; i < childCountAt1Leave; i++) {
+			jTree.expandPath(new TreePath(((DefaultMutableTreeNode) node.getChildAt(i)).getPath()));
+		}
+	}
+
+	/**
+	 * 展开节电下全部节点
+	 */
+	private static void expandAllNode(DefaultMutableTreeNode node, JTree tree) {
+		int childCount = node.getChildCount();
+		for (int i = 0; i < childCount; i++) {
+			DefaultMutableTreeNode childNode = ((DefaultMutableTreeNode) node.getChildAt(i));
+			tree.expandPath(new TreePath(childNode.getPath()));
+			expandAllNode(childNode, tree);
+		}
 	}
 
 	/**
@@ -509,6 +455,7 @@ public class MainWindow {
 			});
 		} else {
 			programTypeList.setModel(new AbstractListModel<Object>() {
+
 				private static final long serialVersionUID = 1L;
 
 				public int getSize() {
@@ -518,10 +465,10 @@ public class MainWindow {
 				public Object getElementAt(int index) {
 					return "无类型信息！";
 				}
+
 			});
 		}
-		programTypeList.validate();
-		programTypeList.repaint();
+		programTypeList.updateUI();
 	}
 
 	/**
@@ -532,6 +479,27 @@ public class MainWindow {
 			programList.setModel(new AbstractListModel<Object>() {
 				private static final long serialVersionUID = 1L;
 				List<Integer> values = ProgramInfoList.getInstance().getProgramIdList();
+
+				public int getSize() {
+					return values.size();
+				}
+
+				public Object getElementAt(int index) {
+					return "节目号：" + values.get(index);
+				}
+			});
+		} else if (TableData.getInstance() != null && TableData.getInstance().getPatTable() != null
+				&& TableData.getInstance().getPatTable().getPatProgramInfo().length > 0) {
+			PAT_ProgramInfo[] proInfoArray = TableData.getInstance().getPatTable().getPatProgramInfo();
+			List<Integer> values = new LinkedList<Integer>();
+			for (int index = 0; index < proInfoArray.length; index++) {
+				PAT_ProgramInfo programInfo = proInfoArray[index];
+				values.add(programInfo.getProgramNumber());
+			}
+
+			programList.setModel(new AbstractListModel<Object>() {
+
+				private static final long serialVersionUID = 1L;
 
 				public int getSize() {
 					return values.size();
@@ -555,15 +523,59 @@ public class MainWindow {
 			});
 		}
 
-		programList.validate();
-		programList.repaint();
+		programList.updateUI();
+	}
+
+	class programTypeListSelectionListener implements ListSelectionListener {
+		public void valueChanged(ListSelectionEvent e) {
+			if (programTypeList.getSelectedValue() != null && !programTypeList.getSelectedValue().equals("无类型信息！")) {
+				List<EpgTableInfoBean> listTemp = new ArrayList<>();
+				for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
+					if (epgInfoBean.getProgramType() != null && epgInfoBean.getProgramType()
+							.contains((CharSequence) programTypeList.getSelectedValue())) {
+						listTemp.add(epgInfoBean);
+					}
+				}
+				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
+				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				reflashEpgTable();
+			}
+		}
+	}
+
+	class programListSelectionListener implements ListSelectionListener {
+		public void valueChanged(ListSelectionEvent e) {
+			if (programList.getSelectedValue() != null && !programList.getSelectedValue().equals("无节目！")
+					&& epgTableInfoListVo != null) {
+				List<EpgTableInfoBean> listTemp = new ArrayList<>();
+				String digit = TS_Utils.getDigit((String) programList.getSelectedValue());
+				for (EpgTableInfoBean epgInfoBean : epgTableInfoListVo) {
+					if (digit.equals("" + epgInfoBean.getServiceId())) {
+						listTemp.add(epgInfoBean);
+					}
+				}
+				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
+				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				reflashEpgTable();
+			}
+		}
+	}
+
+	class showAllEpgBtnActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			if (epgTableInfoListVo != null) {
+				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
+				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(epgTableInfoListVo);
+				reflashEpgTable();
+			}
+		}
 	}
 
 	/**
 	 * 刷新Epg表数据方法
 	 */
 	public static synchronized void reflashEpgTable() {
-		// TOOD 考虑是否改为对数据进行操作时，相应的对Model进行操作
-		programInfoTable.revalidate();
+		// OPT 考虑是否改为对数据进行操作时，相应的对Model进行操作
+		programInfoTable.updateUI();
 	}
 }

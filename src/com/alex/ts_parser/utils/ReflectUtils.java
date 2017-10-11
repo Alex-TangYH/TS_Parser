@@ -102,8 +102,7 @@ public class ReflectUtils {
 						Object o = field.get(obj);
 						DefaultMutableTreeNode childs = null;
 						if (o == null) {
-							// TODO 去除注释
-							// logger.info(String.format("%s is null", varName));
+							 logger.debug(String.format("%s is null", varName));
 						} else if (o.getClass().isArray()) { // 判断是否是数组
 							if (!isJavaClass(o.getClass())) {
 								Object[] arr = (Object[]) o; // 装换成数组
@@ -225,7 +224,6 @@ public class ReflectUtils {
 							field.setAccessible(false);
 					} catch (Exception ex) {
 						logger.error("getTreeByObjAttr", ex);
-//						ex.printStackTrace();
 					}
 				}
 			}
