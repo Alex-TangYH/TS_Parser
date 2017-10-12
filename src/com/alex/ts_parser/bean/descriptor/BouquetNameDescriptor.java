@@ -1,19 +1,19 @@
 package com.alex.ts_parser.bean.descriptor;
 
 public class BouquetNameDescriptor extends Descriptor {
-	private byte[] bouquetNameDescriptorInfo;
+	private byte[] bouquetName;
 
-	public BouquetNameDescriptor(int descriptorTag, int descriptorLength, byte[] bouquetNameDescriptorInfo) {
+	public BouquetNameDescriptor(int descriptorTag, int descriptorLength, byte[] bouquetName) {
 		super(descriptorTag, descriptorLength);
-		this.bouquetNameDescriptorInfo = bouquetNameDescriptorInfo;
+		this.bouquetName = bouquetName;
 	}
 
 	public byte[] getBouquetNameDescriptorInfo() {
-		return bouquetNameDescriptorInfo;
+		return bouquetName;
 	}
 
-	public void setBouquetNameDescriptorInfo(byte[] bouquetNameDescriptorInfo) {
-		this.bouquetNameDescriptorInfo = bouquetNameDescriptorInfo;
+	public void setBouquetNameDescriptorInfo(byte[] bouquetName) {
+		this.bouquetName = bouquetName;
 	}
 	
 	

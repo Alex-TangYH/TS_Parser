@@ -1,4 +1,4 @@
-package com.alex.ts_parser.bean.descriptor;
+package com.alex.ts_parser.bean.map;
 
 import java.util.HashMap;
 import java.util.Map;

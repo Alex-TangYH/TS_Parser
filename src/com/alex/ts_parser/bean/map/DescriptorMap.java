@@ -1,4 +1,4 @@
-package com.alex.ts_parser.bean.descriptor;
+package com.alex.ts_parser.bean.map;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +19,7 @@ public class DescriptorMap {
 		descriptorNameMap.put(65, "ServiceListDescriptor");
 		descriptorNameMap.put(67, "SatelliteDeliverySystemDescriptor");
 		descriptorNameMap.put(68, "CableDeliverySystemDescriptor");
+		descriptorNameMap.put(71, "BouquetNameDescriptor");
 		descriptorNameMap.put(72, "ServiceDescriptor");
 		descriptorNameMap.put(74, "LinkageDescriptor");
 		descriptorNameMap.put(77, "ShortEventDescriptor");

@@ -1,5 +1,7 @@
 package com.alex.ts_parser.bean.descriptor;
 
+import com.alex.ts_parser.bean.map.DescriptorMap;
+
 /**
  * ÃèÊö·û»ùÀà
  * 

@@ -41,9 +41,9 @@ import javax.swing.tree.TreePath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.alex.ts_parser.AddTableThread;
-import com.alex.ts_parser.AddTableThread.SiTableType;
-import com.alex.ts_parser.AddTableThread.PsiTableType;
+import com.alex.ts_parser.ParseTableThread;
+import com.alex.ts_parser.ParseTableThread.SiTableType;
+import com.alex.ts_parser.ParseTableThread.PsiTableType;
 import com.alex.ts_parser.FillEpgDataThread;
 import com.alex.ts_parser.bean.EpgTableInfoBean;
 import com.alex.ts_parser.bean.EpgTableModel;
@@ -311,7 +311,7 @@ public class MainWindow {
 		for (SiTableType type : SiTableType.values()) {
 			DefaultMutableTreeNode siTableNode = new DefaultMutableTreeNode(type);
 			siRoot.add(siTableNode);
-			AddTableThread addTableThread = new AddTableThread(type, siTableNode, filePath);
+			ParseTableThread addTableThread = new ParseTableThread(type, siTableNode, filePath);
 			addTableThread.start();
 		}
 	}
@@ -327,7 +327,7 @@ public class MainWindow {
 		for (PsiTableType type : PsiTableType.values()) {
 			DefaultMutableTreeNode psiTableNode = new DefaultMutableTreeNode(type);
 			psiRoot.add(psiTableNode);
-			AddTableThread addTableThread = new AddTableThread(type, psiTableNode, filePath);
+			ParseTableThread addTableThread = new ParseTableThread(type, psiTableNode, filePath);
 			addTableThread.start();
 		}
 	}
@@ -345,7 +345,7 @@ public class MainWindow {
 			if (fileChooserState == JFileChooser.APPROVE_OPTION) { // 打开文件
 				filePath = jFileChooser.getSelectedFile().getAbsolutePath();
 				fileName = jFileChooser.getSelectedFile().getName();
-				logger.info("当前文件路径：" + filePath + ";当前文件名：" + fileName);
+				logger.info("当前文件路径：" + filePath);
 				if (filePath == null || filePath.isEmpty()) {
 					logger.info("没有选中文件");
 				} else if (TS_Utils.isResolvableFile(filePath)) {
@@ -537,7 +537,12 @@ public class MainWindow {
 					}
 				}
 				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
-				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				if(listTemp.size() == 0) {
+					ToastOfSwing toast = new ToastOfSwing(MainWindow.frmTs, "无此类型EPG信息！", 1500, ToastOfSwing.msg);
+					toast.start();					
+				}else {
+					EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				}
 				reflashEpgTable();
 			}
 		}
@@ -555,7 +560,12 @@ public class MainWindow {
 					}
 				}
 				EpgTableInfoList.getInstance().getEpgTableInfolist().clear();
-				EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				if(listTemp.size() == 0) {
+					ToastOfSwing toast = new ToastOfSwing(MainWindow.frmTs, "无此节目EPG信息！", 1500, ToastOfSwing.msg);
+					toast.start();					
+				}else {
+					EpgTableInfoList.getInstance().getEpgTableInfolist().addAll(listTemp);
+				}
 				reflashEpgTable();
 			}
 		}
